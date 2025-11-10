@@ -7,10 +7,7 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 public class ConfigManager {
     private final Plugin plugin;
@@ -169,6 +166,16 @@ public class ConfigManager {
         return false;
     }
 
+    public boolean isEnhanceableEquipment(String materialName) {
+        materialName = materialName.toUpperCase();
+        for (String suffix : enhanceableEquipmentSuffixes) {
+            if (suffix.endsWith(materialName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // 工具方法：获取装备类型
     public String getEquipmentType(Material material) {
         String materialName = material.name();
@@ -186,8 +193,27 @@ public class ConfigManager {
         loadConfig();
     }
 
-    public int getEquipmentMaxAttributes(String type){
-        List<String> attributes = attributePool.get(type);
-        return attributes != null ? attributes.size() : 0;
+    public List<String> getEquipmentCommonAttributes(String type){
+        List<String> equipmentCommonAttributes = attributePool.get(type);
+        Iterator<String> iterable = equipmentCommonAttributes.iterator();
+        while(iterable.hasNext()){
+            String currentAttribute = iterable.next();
+            if(attributes.get(currentAttribute).rare){
+                iterable.remove();
+            }
+        }
+        return equipmentCommonAttributes;
+    }
+
+    public List<String> getEquipmentRareAttributes(String type){
+        List<String> equipmentCommonAttributes = attributePool.get(type);
+        Iterator<String> iterable = equipmentCommonAttributes.iterator();
+        while(iterable.hasNext()){
+            String currentAttribute = iterable.next();
+            if(!attributes.get(currentAttribute).rare){
+                iterable.remove();
+            }
+        }
+        return equipmentCommonAttributes;
     }
 }

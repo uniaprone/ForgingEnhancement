@@ -25,12 +25,13 @@ public class AnvilForgingListener implements Listener {
     private NamespacedKey enhancementKey;
     private NamespacedKey baseAttributeKey;
 
-    private final Map<Material, String> stoneToQuality = new HashMap<>();
-
-    // 品质等级映射
-    private final Map<String, Integer> qualityLevels = new HashMap<>();
-    private final List<String> qualityOrder = Arrays.asList(
-            "BROKEN", "COMMON", "UNCOMMON", "EPIC", "LEGENDARY", "MYTHIC"
+    private final Map<Integer, String> levelQualityMap = Map.of(
+            0, "BROKEN",
+            1, "COMMON",
+            2, "UNCOMMON",
+            3, "EPIC",
+            4, "LEGENDARY",
+            5, "MYTHIC"
     );
     private Random random;
     
@@ -41,9 +42,6 @@ public class AnvilForgingListener implements Listener {
         this.random = new Random();
         this.enhancementKey = new NamespacedKey(plugin, "enhancement_data");
         this.baseAttributeKey = new NamespacedKey(plugin, "base_attribute_applied");
-
-        // 初始化品质等级
-        initializeQualityLevels();
     }
 
     // 修改onPrepareAnvil方法中的锻造石识别部分
@@ -54,21 +52,26 @@ public class AnvilForgingListener implements Listener {
         ItemStack secondItem = anvil.getSecondItem();
 
         if (firstItem != null && secondItem != null && isForgingStone(secondItem)) {
-            if (isEnhanceableEquipment(firstItem)) {
-                if (hasEnhancement(firstItem)) {
-                    plugin.getLogger().info("已经附魔了");
-                    return;
-                }
-
+            String firstItemType = configManager.getEquipmentType(firstItem.getType());
+            plugin.getLogger().warning(
+                    "物品名:" + firstItem.getType() + "类型" + firstItemType + "是否可强化" + configManager.isEnhanceableEquipment(firstItemType));
+            if (configManager.isEnhanceableEquipment(firstItemType)) {
                 // 获取锻造石对应的品质
                 String baseQuality = plugin.getStoneQuality(secondItem);
                 // 对品质进行再随机
                 String finalItemQuality = randomizeQuality(baseQuality);
 
                 // 确定词条数量
-                int maxAttributes = getMaxAttributesForEquipment(firstItem.getType());
-                int attributeCount = random.nextInt(maxAttributes + 1);
-
+                int maxAttributes = configManager.getEquipmentCommonAttributes(firstItemType).size();
+                int attributeCount = calculateAttributeCount(baseQuality, maxAttributes);
+                plugin.getLogger().warning(
+                        "物品名:" + firstItem.getType() + "类型" + firstItemType + "品质:" + finalItemQuality +  "最大词条数:" + maxAttributes +  "无法获取词条数量" + attributeCount
+                );
+                if(attributeCount == -1){
+                    plugin.getLogger().warning(
+                            "物品名:" + firstItem.getType() + "类型" + firstItemType + "品质:" + finalItemQuality +  "最大词条数:" + maxAttributes +  "无法获取词条数量"
+                    );
+                }
                 // 应用强化
                 ItemStack result = applyEnhancement(firstItem, finalItemQuality, attributeCount);
 
@@ -82,29 +85,40 @@ public class AnvilForgingListener implements Listener {
             }
         }
     }
-    private String randomizeQuality(String baseQuality) {
-        int baseLevel = qualityLevels.get(baseQuality);
-
-        // 品质随机规则：有概率提升或降低1级
-        // 50%概率保持原品质，25%概率提升1级，25%概率降低1级
-        double rand = random.nextDouble();
-        int newLevel = baseLevel;
-
-        if (rand < 0.25 && baseLevel > 0) {
-            // 降低1级
-            newLevel = baseLevel - 1;
-        } else if (rand > 0.75 && baseLevel < qualityOrder.size() - 1) {
-            // 提升1级
-            newLevel = baseLevel + 1;
+    private int calculateAttributeCount(String baseQuality, int maxAttributes) {
+        int qualityLevel = getLevelByQuality(baseQuality);
+        switch (qualityLevel) {
+            case 0, 1:
+                return Math.max((int) Math.round((maxAttributes * (0.2 + random.nextDouble() * (0.2)))), 1);
+            case 2:
+                return Math.max((int) Math.round((maxAttributes * (0.4 + random.nextDouble() * (0.2)))), 1);
+            case 3, 4:
+                return Math.max((int) Math.round((maxAttributes * (0.6 + random.nextDouble() * (0.2)))), 1);
+            case 5:
+                return Math.max((int) Math.round((maxAttributes * (0.8 + random.nextDouble() * (0.2)))), 1);
+            default:
+                return -1;
         }
-
-        return qualityOrder.get(newLevel);
     }
+    private String randomizeQuality(String baseQuality) {
+        int baseLevel =getLevelByQuality(baseQuality);
+        int maxLevel = levelQualityMap.size() - 1;
 
-    private int getMaxAttributesForEquipment(Material material) {
-        String equipmentType = configManager.getEquipmentType(material);
-        plugin.getLogger().info("装备类型"+equipmentType);
-        return configManager.getEquipmentMaxAttributes(equipmentType);
+        // 使用正态分布，均值为基础品质等级，标准差为1.0
+        double mean = baseLevel;
+        double standardDeviation = 0.6;
+
+        double gaussianValue;
+        int newLevel;
+
+        // 使用截断正态分布，确保结果在合理范围内
+        do {
+            gaussianValue = random.nextGaussian();
+            double adjustedValue = mean + standardDeviation * gaussianValue;
+            newLevel = (int) Math.round(adjustedValue);
+        } while (newLevel < 0 || newLevel > maxLevel);
+
+        return levelQualityMap.get(newLevel);
     }
 
     private ItemStack applyEnhancement(ItemStack originalItem, String itemQuality, int attributeCount) {
@@ -294,8 +308,6 @@ public class AnvilForgingListener implements Listener {
         meta.getPersistentDataContainer().set(baseAttributeKey, PersistentDataType.BYTE, (byte) 1);
     }
 
-
-
     private void updateBasicItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, String itemQuality) {
         List<String> originalLore = originalMeta.hasLore() ? originalMeta.getLore() : new ArrayList<>();
         if (originalLore == null) originalLore = new ArrayList<>();
@@ -326,7 +338,7 @@ public class AnvilForgingListener implements Listener {
 
     private List<EnhancementAttribute> calculateAttributeQualities(List<String> attributes, String itemQuality, int attributeCount) {
         List<EnhancementAttribute> enhancements = new ArrayList<>();
-        int itemQualityLevel = qualityLevels.get(itemQuality);
+        int itemQualityLevel = getLevelByQuality(itemQuality);
 
         // 计算总品质点数（每个词条基础为物品品质等级）
         int totalQualityPoints = itemQualityLevel * attributeCount;
@@ -355,7 +367,7 @@ public class AnvilForgingListener implements Listener {
         // 创建增强属性对象
         for (int i = 0; i < attributeCount; i++) {
             String attributeKey = attributes.get(i);
-            String quality = getQualityByLevel(attributeLevels[i]);
+            String quality = levelQualityMap.get(attributeLevels[i]);
 
             ConfigManager.AttributeConfig attrConfig = configManager.getAttributeConfig(attributeKey);
             if (attrConfig != null) {
@@ -371,13 +383,7 @@ public class AnvilForgingListener implements Listener {
 
     private boolean canAdjustQuality(int currentLevel, int adjustment) {
         int newLevel = currentLevel + adjustment;
-        return newLevel >= 0 && newLevel < qualityOrder.size();
-    }
-
-    private String getQualityByLevel(int level) {
-        if (level < 0) return qualityOrder.get(0);
-        if (level >= qualityOrder.size()) return qualityOrder.get(qualityOrder.size() - 1);
-        return qualityOrder.get(level);
+        return newLevel >= 0 && newLevel < levelQualityMap.size();
     }
 
     private double calculateAttributeValue(ConfigManager.AttributeConfig config, String quality) {
@@ -495,9 +501,13 @@ public class AnvilForgingListener implements Listener {
         return plugin.isForgingStone(item);
     }
 
-    public boolean isEnhanceableEquipment(ItemStack item) {
-        if (item == null) return false;
-        return configManager.isEnhanceableEquipment(item.getType());
+    private int getLevelByQuality(String quality){
+        for (int i = 0; i < levelQualityMap.size(); i++) {
+            if(levelQualityMap.get(i).equals(quality)){
+                return i;
+            }
+        }
+        return 0;
     }
 
     public boolean hasEnhancement(ItemStack item) {
@@ -536,12 +546,6 @@ public class AnvilForgingListener implements Listener {
             default:
                 plugin.getLogger().warning("不支持的属性类型: " + configKey);
                 return null;
-        }
-    }
-
-    private void initializeQualityLevels() {
-        for (int i = 0; i < qualityOrder.size(); i++) {
-            qualityLevels.put(qualityOrder.get(i), i);
         }
     }
 

@@ -1,11 +1,10 @@
-package org.zzq.forgingEnhancement;
+package org.zzq.forgingEnhancement.manager;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.Material;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.inventory.EquipmentSlot;
 
 import java.io.File;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class ConfigManager {
-    private Plugin plugin;
+    private final Plugin plugin;
     private FileConfiguration config;
     private File configFile;
 
@@ -26,21 +25,6 @@ public class ConfigManager {
     private Map<String, List<String>> attributePool;
     private Map<String, AttributeConfig> attributes;
     private Map<String, EquipmentSlotGroup> equipmentSlots;
-
-    // 内部类用于存储基础属性配置
-    public static class BaseAttributeConfig {
-        public String attribute;
-        public double value;
-        public String operation;
-        public EquipmentSlotGroup slot;
-
-        public BaseAttributeConfig(String attribute, double value, String operation, EquipmentSlotGroup slot) {
-            this.attribute = attribute;
-            this.value = value;
-            this.operation = operation;
-            this.slot = slot;
-        }
-    }
 
     // 内部类用于存储属性配置
     public static class AttributeConfig {
@@ -91,9 +75,14 @@ public class ConfigManager {
                 plugin.saveResource("config.yml", false);
             }
             config = YamlConfiguration.loadConfiguration(configFile);
+            parseConfig();
+            plugin.getLogger().info("配置文件加载完成，共加载 " + attributePool.size() + " 种装备的基础属性");
         }catch (Exception e){
             plugin.getLogger().warning("无法读取配置文件!");
         }
+    }
+
+    private void parseConfig() {
         // 读取稀有词条概率
         rareChance = config.getDouble("rare-chance", 0.2);
 
@@ -153,21 +142,8 @@ public class ConfigManager {
         }
     }
 
-    // Getter 方法
-    public double getRareChance() {
-        return rareChance;
-    }
-
-    public List<Material> getForgingStones() {
-        return new ArrayList<>(forgingStones);
-    }
-
     public List<String> getEnhanceableEquipmentSuffixes() {
         return new ArrayList<>(enhanceableEquipmentSuffixes);
-    }
-
-    public String getMessage(String key) {
-        return messages.get(key);
     }
 
     public List<String> getAttributesForEquipment(String equipmentType) {
@@ -180,10 +156,6 @@ public class ConfigManager {
 
     public Map<String, AttributeConfig> getAllAttributes() {
         return new HashMap<>(attributes);
-    }
-
-    public EquipmentSlotGroup getEquipmentSlot(String equipmentType) {
-        return equipmentSlots.get(equipmentType);
     }
 
     // 工具方法：检查物品是否是可强化装备
@@ -214,16 +186,8 @@ public class ConfigManager {
         loadConfig();
     }
 
-    public Map<String, List<String>> getAttributePool() {
-        return attributePool;
-    }
-
     public int getEquipmentMaxAttributes(String type){
         List<String> attributes = attributePool.get(type);
         return attributes != null ? attributes.size() : 0;
-    }
-
-    public Map<String, AttributeConfig> getAttributes() {
-        return attributes;
     }
 }

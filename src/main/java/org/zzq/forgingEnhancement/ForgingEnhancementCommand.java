@@ -25,7 +25,7 @@ public class ForgingEnhancementCommand implements CommandExecutor {
             case "reload":
                 if (sender.hasPermission("forgingenhancement.admin")) {
                     // 重载配置管理器
-                    plugin.getConfigManager().reloadConfig();
+                    plugin.getFileManager().reloadFile();
                     // 重载插件配置
                     plugin.reloadConfig();
                     sender.sendMessage(ChatColor.GREEN + "锻造增强插件配置已重载!");
@@ -75,11 +75,11 @@ public class ForgingEnhancementCommand implements CommandExecutor {
         player.sendMessage(ChatColor.GREEN + "✓ 可配置的属性池和数值范围");
 
         // 显示可强化的装备类型数量
-        int equipmentTypes = plugin.getConfigManager().getEnhanceableEquipmentSuffixes().size();
+        int equipmentTypes = plugin.getFileManager().getConfigManager().getEnhanceableEquipmentSuffixes().size();
         player.sendMessage(ChatColor.AQUA + "可强化装备类型: " + equipmentTypes + "种");
 
         // 显示支持的属性数量
-        int attributeCount = plugin.getConfigManager().getAllAttributes().size();
+        int attributeCount = plugin.getFileManager().getConfigManager().getAllAttributes().size();
         player.sendMessage(ChatColor.AQUA + "支持属性数量: " + attributeCount + "种");
     }
 }

@@ -1,9 +1,10 @@
-package org.zzq.forgingEnhancement;
+package org.zzq.forgingEnhancement.manager;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.zzq.forgingEnhancement.Util;
 
 import java.io.File;
 import java.util.*;
@@ -15,7 +16,6 @@ import java.util.logging.Level;
 public class BaseAttributeManager {
     private final Plugin plugin;
     private FileConfiguration baseAttributeConfig;
-    private File baseAttributeFile;
 
     // 存储基础属性配置：装备类型 -> 具体装备 -> 属性映射
     private final Map<String, Map<String, Map<String, Double>>> baseAttributes;
@@ -31,7 +31,7 @@ public class BaseAttributeManager {
      */
     public void loadBaseAttributeConfig() {
         try {
-            baseAttributeFile = new File(plugin.getDataFolder(), "base_attributes.yml");
+            File baseAttributeFile = new File(plugin.getDataFolder(), "base_attributes.yml");
 
             // 如果文件不存在，从资源中保存默认配置
             if (!baseAttributeFile.exists()) {
@@ -42,7 +42,6 @@ public class BaseAttributeManager {
             baseAttributeConfig = YamlConfiguration.loadConfiguration(baseAttributeFile);
             parseBaseAttributes();
             plugin.getLogger().info("基础属性配置加载完成，共加载 " + getTotalEquipmentCount() + " 种装备的基础属性");
-
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "加载基础属性配置失败", e);
         }
@@ -125,32 +124,6 @@ public class BaseAttributeManager {
     }
 
     /**
-     * 获取所有装备类型的基础属性配置
-     */
-    public Map<String, Map<String, Map<String, Double>>> getAllBaseAttributes() {
-        Map<String, Map<String, Map<String, Double>>> result = new HashMap<>();
-        for (Map.Entry<String, Map<String, Map<String, Double>>> entry : baseAttributes.entrySet()) {
-            result.put(entry.getKey(), new HashMap<>(entry.getValue()));
-        }
-        return result;
-    }
-
-    /**
-     * 获取指定装备类型的所有基础属性配置
-     */
-    public Map<String, Map<String, Double>> getBaseAttributesByType(String equipmentType) {
-        Map<String, Map<String, Double>> typeAttributes = baseAttributes.get(equipmentType);
-        return typeAttributes != null ? new HashMap<>(typeAttributes) : Collections.emptyMap();
-    }
-
-    /**
-     * 检查装备是否有基础属性配置
-     */
-    public boolean hasBaseAttributes(Material material) {
-        return !getBaseAttributes(material).isEmpty();
-    }
-
-    /**
      * 获取配置的装备总数
      */
     public int getTotalEquipmentCount() {
@@ -164,43 +137,12 @@ public class BaseAttributeManager {
     /**
      * 重新加载配置
      */
-    public void reloadConfig() {
+    public void reloadBaseAttribute() {
         try {
-            baseAttributeConfig = YamlConfiguration.loadConfiguration(baseAttributeFile);
-            parseBaseAttributes();
+            loadBaseAttributeConfig();
             plugin.getLogger().info("基础属性配置已重新加载");
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "重新加载基础属性配置失败", e);
         }
-    }
-
-    /**
-     * 获取支持的属性类型列表
-     */
-    public Set<String> getSupportedAttributeTypes() {
-        Set<String> attributeTypes = new HashSet<>();
-        for (Map<String, Map<String, Double>> typeAttributes : baseAttributes.values()) {
-            for (Map<String, Double> attributes : typeAttributes.values()) {
-                attributeTypes.addAll(attributes.keySet());
-            }
-        }
-        return attributeTypes;
-    }
-
-    /**
-     * 调试方法：打印所有基础属性配置
-     */
-    public void debugPrintAllAttributes() {
-        plugin.getLogger().info("=== 基础属性配置调试信息 ===");
-        for (String equipmentType : baseAttributes.keySet()) {
-            Map<String, Map<String, Double>> typeAttributes = baseAttributes.get(equipmentType);
-            plugin.getLogger().info("装备类型: " + equipmentType + " (" + typeAttributes.size() + " 种装备)");
-
-            for (String equipmentName : typeAttributes.keySet()) {
-                Map<String, Double> attributes = typeAttributes.get(equipmentName);
-                plugin.getLogger().info("  " + equipmentName + ": " + attributes);
-            }
-        }
-        plugin.getLogger().info("总计: " + getTotalEquipmentCount() + " 种装备的基础属性");
     }
 }

@@ -1,29 +1,23 @@
 package org.zzq.forgingEnhancement;
 
-import com.google.common.collect.Multimap;
-import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
-import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.view.AnvilView;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.zzq.forgingEnhancement.manager.BaseAttributeManager;
+import org.zzq.forgingEnhancement.manager.ConfigManager;
+import org.zzq.forgingEnhancement.manager.FileManager;
 
-import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ForgingEnhancement extends JavaPlugin implements Listener {
 
@@ -31,6 +25,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     private NamespacedKey baseAttributeKey;
     private ConfigManager configManager;
     private BaseAttributeManager baseAttributeManager;
+    private FileManager fileManager;
     private Random random;
     // 锻造石与品质的映射
     private final Map<Material, String> stoneToQuality = new HashMap<>();
@@ -43,8 +38,9 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        this.configManager = new ConfigManager(this);
-        this.baseAttributeManager = new BaseAttributeManager(this);
+        this.fileManager = FileManager.getInstance(this);
+        this.configManager = fileManager.getConfigManager();
+        this.baseAttributeManager = fileManager.getBaseAttributeManager();
         this.enhancementKey = new NamespacedKey(this, "enhancement_data");
         this.baseAttributeKey = new NamespacedKey(this, "base_attribute_applied");
         this.random = new Random();
@@ -573,12 +569,8 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         }
     }
 
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-
-    public BaseAttributeManager getBaseAttributeManager() {
-        return baseAttributeManager;
+    public FileManager getFileManager() {
+        return fileManager;
     }
 
     // 内部类，用于存储强化属性信息

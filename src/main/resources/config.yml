@@ -2,13 +2,6 @@
 # 稀有词条出现概率 (0-1)
 rare-chance: 0.2
 
-# 锻造石材料列表
-forging-stones:
-  - NETHERITE_UPGRADE_SMITHING_TEMPLATE
-  - NETHERITE_SCRAP
-  - AMETHYST_SHARD
-  - DIAMOND
-
 # 可强化的装备类型后缀
 enhanceable-equipment-suffixes:
   - _BOOTS

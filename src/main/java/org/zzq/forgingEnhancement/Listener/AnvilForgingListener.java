@@ -41,12 +41,12 @@ public class AnvilForgingListener implements Listener {
         this.random = new Random();
         this.enhancementKey = new NamespacedKey(plugin, "enhancement_data");
         this.baseAttributeKey = new NamespacedKey(plugin, "base_attribute_applied");
-        // 初始化锻造石品质映射
-        initializeStoneQualities();
 
         // 初始化品质等级
         initializeQualityLevels();
     }
+
+    // 修改onPrepareAnvil方法中的锻造石识别部分
     @EventHandler
     public void onPrepareAnvil(PrepareAnvilEvent event) {
         AnvilInventory anvil = event.getInventory();
@@ -60,8 +60,8 @@ public class AnvilForgingListener implements Listener {
                     return;
                 }
 
-                // 获取锻造石对应的基础品质
-                String baseQuality = stoneToQuality.get(secondItem.getType());
+                // 获取锻造石对应的品质
+                String baseQuality = plugin.getStoneQuality(secondItem);
                 // 对品质进行再随机
                 String finalItemQuality = randomizeQuality(baseQuality);
 
@@ -69,7 +69,7 @@ public class AnvilForgingListener implements Listener {
                 int maxAttributes = getMaxAttributesForEquipment(firstItem.getType());
                 int attributeCount = random.nextInt(maxAttributes + 1);
 
-                // 应用强化 - 这里需要确保保留所有原有属性
+                // 应用强化
                 ItemStack result = applyEnhancement(firstItem, finalItemQuality, attributeCount);
 
                 if (result != null) {
@@ -490,9 +490,9 @@ public class AnvilForgingListener implements Listener {
         }
     }
 
-    // 原有的辅助方法
+    // 修改锻造石识别方法
     private boolean isForgingStone(ItemStack item) {
-        return stoneToQuality.containsKey(item.getType());
+        return plugin.isForgingStone(item);
     }
 
     public boolean isEnhanceableEquipment(ItemStack item) {
@@ -537,14 +537,6 @@ public class AnvilForgingListener implements Listener {
                 plugin.getLogger().warning("不支持的属性类型: " + configKey);
                 return null;
         }
-    }
-
-    private void initializeStoneQualities() {
-        // 四种锻造石对应品质
-        stoneToQuality.put(Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, "COMMON");     // 普通
-        stoneToQuality.put(Material.NETHERITE_SCRAP, "UNCOMMON");                       // 优秀
-        stoneToQuality.put(Material.AMETHYST_SHARD, "EPIC");                            // 史诗
-        stoneToQuality.put(Material.DIAMOND, "LEGENDARY");                              // 传说
     }
 
     private void initializeQualityLevels() {

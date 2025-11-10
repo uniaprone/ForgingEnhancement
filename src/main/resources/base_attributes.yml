@@ -1,0 +1,170 @@
+# 装备基础属性配置
+base_attributes:
+  helmet:
+    leather_helmet:
+      armor: 1
+    chainmail_helmet:
+      armor: 2
+    iron_helmet:
+      armor: 2
+    golden_helmet:
+      armor: 2
+    diamond_helmet:
+      armor: 3
+      armor_toughness: 2
+    netherite_helmet:
+      armor: 3
+      armor_toughness: 3
+      knockback_resistance: 1
+
+  # 胸甲
+  chestplate:
+    leather_chestplate:
+      armor: 3
+    chainmail_chestplate:
+      armor: 5
+    iron_chestplate:
+      armor: 6
+    golden_chestplate:
+      armor: 5
+    diamond_chestplate:
+      armor: 8
+      armor_toughness: 2
+    netherite_chestplate:
+      armor: 8
+      armor_toughness: 3
+      knockback_resistance: 1
+  # 护腿
+  leggings:
+    leather_leggings:
+      armor: 2
+    chainmail_leggings:
+      armor: 4
+    iron_leggings:
+      armor: 5
+    golden_leggings:
+      armor: 3
+    diamond_leggings:
+      armor: 6
+      armor_toughness: 2
+    netherite_leggings:
+      armor: 6
+      armor_toughness: 3
+      knockback_resistance: 1
+  # 靴子
+  boots:
+    leather_boots:
+      armor: 1
+    chainmail_boots:
+      armor: 1
+    iron_boots:
+      armor: 2
+    golden_boots:
+      armor: 1
+    diamond_boots:
+      armor: 3
+      armor_toughness: 2
+    netherite_boots:
+      armor: 3
+      armor_toughness: 3
+      knockback_resistance: 1
+  # 剑
+  sword:
+    wooden_sword:
+      attack_damage: 3
+      attack_speed: -2.4
+    stone_sword:
+      attack_damage: 4
+      attack_speed: -2.4
+    iron_sword:
+      attack_damage: 5
+      attack_speed: -2.4
+    golden_sword:
+      attack_damage: 3
+      attack_speed: -2.4
+    diamond_sword:
+      attack_damage: 6
+      attack_speed: -2.4
+    netherite_sword:
+      attack_damage: 7
+      attack_speed: -2.4
+  # 斧
+  axe:
+    wooden_axe:
+      attack_damage: 6
+      attack_speed: -3.2
+    stone_axe:
+      attack_damage: 8
+      attack_speed: -3.2
+    iron_axe:
+      attack_damage: 8
+      attack_speed: -3.1
+    golden_axe:
+      attack_damage: 6
+      attack_speed: -3.0
+    diamond_axe:
+      attack_damage: 8
+      attack_speed: -3.0
+    netherite_axe:
+      attack_damage: 9
+      attack_speed: -3.0
+  # 镐
+  pickaxe:
+    wooden_pickaxe:
+      attack_damage: 1
+      attack_speed: -2.8
+    stone_pickaxe:
+      attack_damage: 2
+      attack_speed: -2.8
+    iron_pickaxe:
+      attack_damage: 3
+      attack_speed: -2.8
+    golden_pickaxe:
+      attack_damage: 1
+      attack_speed: -2.8
+    diamond_pickaxe:
+      attack_damage: 4
+      attack_speed: -2.8
+    netherite_pickaxe:
+      attack_damage: 5
+      attack_speed: -2.8
+  # 铲
+  shovel:
+    wooden_shovel:
+      attack_damage: 1.5
+      attack_speed: -3.0
+    stone_shovel:
+      attack_damage: 2.5
+      attack_speed: -3.0
+    iron_shovel:
+      attack_damage: 3.5
+      attack_speed: -3.0
+    golden_shovel:
+      attack_damage: 1.5
+      attack_speed: -3.0
+    diamond_shovel:
+      attack_damage: 4.5
+      attack_speed: -3.0
+    netherite_shovel:
+      attack_damage: 5.5
+      attack_speed: -3.0
+  # 锄
+  hoe:
+    wooden_hoe:
+      attack_damage: 0
+      attack_speed: -3.0
+    stone_hoe:
+      attack_damage: 0
+      attack_speed: -2.0
+    iron_hoe:
+      attack_damage: 0
+      attack_speed: -1.0
+    golden_hoe:
+      attack_damage: 0
+      attack_speed: -3.0
+    diamond_hoe:
+      attack_damage: 0
+      attack_speed: 0.0
+    netherite_hoe:
+      attack_damage: 0
+      attack_speed: 0.0

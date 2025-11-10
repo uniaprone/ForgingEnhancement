@@ -1,0 +1,20 @@
+name: ForgingEnhancement
+version: '1.0-SNAPSHOT'
+main: org.zzq.forgingEnhancement.ForgingEnhancement
+api-version: '1.21'
+author: zzq
+description: 为铁砧锻造添加速度属性增强
+
+commands:
+  forgingenhancement:
+    description: 锻造增强插件主命令
+    aliases: [fe]
+    usage: /<command> <reload>
+
+permissions:
+  forgingenhancement.admin:
+    description: 允许使用管理员命令
+    default: op
+  forgingenhancement.user:
+    description: 允许使用普通用户命令
+    default: true

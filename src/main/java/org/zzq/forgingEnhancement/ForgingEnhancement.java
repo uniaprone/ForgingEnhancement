@@ -7,10 +7,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.zzq.forgingEnhancement.Listener.AnvilClickListener;
-import org.zzq.forgingEnhancement.Listener.AnvilForgingListener;
-import org.zzq.forgingEnhancement.Service.PluginContext;
-import org.zzq.forgingEnhancement.manager.FileManager;
+import org.zzq.forgingEnhancement.commands.ForgingEnhancementCommand;
+import org.zzq.forgingEnhancement.listeners.AnvilClickListener;
+import org.zzq.forgingEnhancement.listeners.AnvilForgingListener;
+import org.zzq.forgingEnhancement.managers.FileManager;
+import org.zzq.forgingEnhancement.managers.KeyManager;
+import org.zzq.forgingEnhancement.managers.StoneManager;
+import org.zzq.forgingEnhancement.services.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,39 +22,18 @@ import java.util.Random;
 public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     private FileManager fileManager;
-    private Random random;
-
-    // NBT标签键
-    private NamespacedKey forgingStoneKey;
-    private NamespacedKey stoneQualityKey;
-    private NamespacedKey enhancementKey;
-    private NamespacedKey baseAttributeKey;
-
-    // 品质到CustomModelData的映射
-    private final Map<String, Integer> qualityToModelData = new HashMap<>();
-    // 品质显示名称映射
-    private final Map<String, String> qualityDisplayNames = new HashMap<>();
+    private KeyManager keyManager;
+    private StoneManager stoneManager;
+    private ForgingService forgingService;
 
     @Override
     public void onEnable() {
-        this.fileManager = FileManager.getInstance(this);
-        PluginContext context = new PluginContext(this);
-        this.random = new Random();
+        this.fileManager = new FileManager(this);
+        this.keyManager = new KeyManager(this);
+        this.stoneManager = new StoneManager(keyManager);
 
-        // 初始化NBT键
-        this.forgingStoneKey = new NamespacedKey(this, "forging_stone");
-        this.stoneQualityKey = new NamespacedKey(this, "stone_quality");
-        this.enhancementKey = new NamespacedKey(this, "forging_data");
-        this.baseAttributeKey = new NamespacedKey(this, "base_attribute_applied");
-
-
-        // 初始化品质映射
-        initializeQualityMappings();
-
-        getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new AnvilForgingListener(this), this);
-        getServer().getPluginManager().registerEvents(new AnvilClickListener(context), this);
-
+        initializeService();
+        registerListeners();
         // 创建命令执行器实例
         ForgingEnhancementCommand commandExecutor = new ForgingEnhancementCommand(this);
 
@@ -61,19 +43,25 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
         getLogger().info("锻造增强插件已启用!");
     }
+    private void initializeService(){
+        AttributeApplicationService attributeApplicationService = new AttributeApplicationService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
+        EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager());
+        ItemDisplayService itemDisplayService = new ItemDisplayService(fileManager.getConfigManager());
+        NBTService nbtService = new NBTService(keyManager);
+        this.forgingService = new ForgingService(
+                attributeApplicationService,
+                enhancementService,
+                itemDisplayService,
+                nbtService,
+                fileManager.getConfigManager(),
+                stoneManager,
+                keyManager);
+    }
 
-    private void initializeQualityMappings() {
-        // CustomModelData映射
-        qualityToModelData.put("COMMON", 1001);
-        qualityToModelData.put("UNCOMMON", 1002);
-        qualityToModelData.put("EPIC", 1003);
-        qualityToModelData.put("LEGENDARY", 1004);
-
-        // 显示名称映射
-        qualityDisplayNames.put("COMMON", "普通");
-        qualityDisplayNames.put("UNCOMMON", "优秀");
-        qualityDisplayNames.put("EPIC", "史诗");
-        qualityDisplayNames.put("LEGENDARY", "传说");
+    private void registerListeners(){
+        getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new AnvilForgingListener(fileManager.getConfigManager(), stoneManager), this);
+        getServer().getPluginManager().registerEvents(new AnvilClickListener(forgingService), this);
     }
 
     @Override
@@ -85,88 +73,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         return fileManager;
     }
 
-    // 创建自定义锻造石
-    public ItemStack createForgingStone(String quality, int amount) {
-        ItemStack stone = new ItemStack(Material.NETHER_STAR, amount);
-        ItemMeta meta = stone.getItemMeta();
-
-        if (meta == null) return stone;
-
-        // 设置CustomModelData（客户端视觉区分）
-        Integer modelData = qualityToModelData.get(quality);
-        if (modelData != null) {
-            meta.setCustomModelData(modelData);
-        }
-
-        // 设置显示名称和Lore
-        String displayName = getQualityColor(quality) + qualityDisplayNames.get(quality) + "锻造石";
-        meta.setDisplayName(displayName);
-
-        java.util.List<String> lore = new java.util.ArrayList<>();
-        lore.add("§7用于在铁砧中强化装备");
-        lore.add("§7品质: " + qualityDisplayNames.get(quality));
-        lore.add("§8ID: " + quality.toLowerCase());
-        meta.setLore(lore);
-
-        // 添加NBT标签（服务器逻辑验证）
-        meta.getPersistentDataContainer().set(forgingStoneKey, PersistentDataType.BYTE, (byte) 1);
-        meta.getPersistentDataContainer().set(stoneQualityKey, PersistentDataType.STRING, quality);
-
-        stone.setItemMeta(meta);
-        return stone;
-    }
-
-    // 验证是否为锻造石
-    public boolean isForgingStone(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return false;
-        ItemMeta meta = item.getItemMeta();
-        Byte isStone = meta.getPersistentDataContainer().get(forgingStoneKey, PersistentDataType.BYTE);
-        return isStone != null && isStone == 1;
-    }
-
-    // 获取锻造石品质
-    public String getStoneQuality(ItemStack stone) {
-        if (!isForgingStone(stone)) return null;
-        ItemMeta meta = stone.getItemMeta();
-        return meta.getPersistentDataContainer().get(stoneQualityKey, PersistentDataType.STRING);
-    }
-
-    // 获取品质颜色
-    private String getQualityColor(String quality) {
-        switch (quality) {
-            case "COMMON": return "§f";     // 白色
-            case "UNCOMMON": return "§a";   // 绿色
-            case "EPIC": return "§5";       // 紫色
-            case "LEGENDARY": return "§6";  // 金色
-            default: return "§f";
-        }
-    }
-
-    public Random getRandom() {
-        return random;
-    }
-
-    public NamespacedKey getForgingStoneKey() {
-        return forgingStoneKey;
-    }
-
-    public NamespacedKey getStoneQualityKey() {
-        return stoneQualityKey;
-    }
-
-    public Map<String, Integer> getQualityToModelData() {
-        return new HashMap<>(qualityToModelData);
-    }
-
-    public Map<String, String> getQualityDisplayNames() {
-        return new HashMap<>(qualityDisplayNames);
-    }
-
-    public NamespacedKey getEnhancementKey() {
-        return enhancementKey;
-    }
-
-    public NamespacedKey getBaseAttributeKey() {
-        return baseAttributeKey;
+    public StoneManager getStoneManager() {
+        return stoneManager;
     }
 }

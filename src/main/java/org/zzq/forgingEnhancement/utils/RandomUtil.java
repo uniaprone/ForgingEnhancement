@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.Util;
+package org.zzq.forgingEnhancement.utils;
 
 import java.util.Random;
 

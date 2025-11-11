@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.model;
+package org.zzq.forgingEnhancement.models;
 
 import java.util.List;
 

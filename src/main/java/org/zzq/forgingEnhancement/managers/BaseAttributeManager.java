@@ -1,10 +1,10 @@
-package org.zzq.forgingEnhancement.manager;
+package org.zzq.forgingEnhancement.managers;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.zzq.forgingEnhancement.Util.Util;
+import org.zzq.forgingEnhancement.utils.Util;
 
 import java.io.File;
 import java.util.*;

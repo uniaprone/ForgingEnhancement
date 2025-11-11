@@ -1,11 +1,10 @@
-package org.zzq.forgingEnhancement.Service;
+package org.zzq.forgingEnhancement.services;
 
 import org.bukkit.inventory.ItemStack;
-import org.zzq.forgingEnhancement.Listener.AnvilForgingListener;
-import org.zzq.forgingEnhancement.Util.RandomUtil;
-import org.zzq.forgingEnhancement.manager.ConfigManager;
-import org.zzq.forgingEnhancement.model.Attribute;
-import org.zzq.forgingEnhancement.model.EnhancementResult;
+import org.zzq.forgingEnhancement.utils.RandomUtil;
+import org.zzq.forgingEnhancement.managers.ConfigManager;
+import org.zzq.forgingEnhancement.models.Attribute;
+import org.zzq.forgingEnhancement.models.EnhancementResult;
 
 import java.util.*;
 

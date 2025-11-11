@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement;
+package org.zzq.forgingEnhancement.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,6 +9,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
+import org.zzq.forgingEnhancement.ForgingEnhancement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,16 +150,16 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
         }
 
         // 验证品质是否有效
-        if (!plugin.getQualityDisplayNames().containsKey(quality)) {
+        if (!plugin.getStoneManager().getQualityDisplayNames().containsKey(quality)) {
             sender.sendMessage(ChatColor.RED + "无效的品质! 可用品质: common, uncommon, epic, legendary");
             return;
         }
 
         // 创建锻造石并给予玩家
-        ItemStack forgingStone = plugin.createForgingStone(quality, amount);
+        ItemStack forgingStone = plugin.getStoneManager().createForgingStone(quality, amount);
         target.getInventory().addItem(forgingStone);
 
-        String displayName = plugin.getQualityDisplayNames().get(quality);
+        String displayName = plugin.getStoneManager().getQualityDisplayNames().get(quality);
         sender.sendMessage(ChatColor.GREEN + "已给予 " + target.getName() + " " + amount + " 个" + displayName + "锻造石");
         if (!sender.equals(target)) {
             target.sendMessage(ChatColor.GREEN + "你获得了 " + amount + " 个" + displayName + "锻造石");

@@ -1,21 +1,29 @@
-package org.zzq.forgingEnhancement.Service;
+package org.zzq.forgingEnhancement.services;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.zzq.forgingEnhancement.Listener.AnvilForgingListener;
-import org.zzq.forgingEnhancement.manager.ConfigManager;
-import org.zzq.forgingEnhancement.model.Attribute;
+import org.zzq.forgingEnhancement.managers.BaseAttributeManager;
+import org.zzq.forgingEnhancement.managers.ConfigManager;
+import org.zzq.forgingEnhancement.managers.KeyManager;
+import org.zzq.forgingEnhancement.models.Attribute;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class AttributeApplicationService {
-    private PluginContext pluginContext;
-    public AttributeApplicationService(PluginContext pluginContext){
-        this.pluginContext = pluginContext;
+    private Logger logger;
+    private ConfigManager configManager;
+    private BaseAttributeManager baseAttributeManager;
+    private KeyManager keyManager;
+
+    public AttributeApplicationService(Logger logger, ConfigManager configManager, BaseAttributeManager baseAttributeManager, KeyManager keyManager){
+        this.logger = logger;
+        this.configManager = configManager;
+        this.baseAttributeManager = baseAttributeManager;
+        this.keyManager = keyManager;
     }
     public void applyExtraAttributes(ItemMeta meta, Material material, List<Attribute> attributes) {
         for (Attribute attribute : attributes) {
@@ -24,28 +32,29 @@ public class AttributeApplicationService {
     }
 
     public void applyBaseAttributes(ItemMeta meta, Material material) {
-        String equipmentType = pluginContext.getConfigManager().getEquipmentType(material);
+        String equipmentType = configManager.getEquipmentType(material);
         if (equipmentType == null) {
-            pluginContext.getLogger().warning("无法确定装备类型: " + material);
+            logger.warning("无法确定装备类型: " + material);
             return;
         }
 
-        Map<String, Double> baseAttrs = pluginContext.getBaseAttributeManager().getBaseAttributes(material);
+        Map<String, Double> baseAttrs = baseAttributeManager.getBaseAttributes(material);
         if (baseAttrs.isEmpty()) {
-            pluginContext.getLogger().warning("装备类型 " + equipmentType + " 没有基础属性配置");
+            logger.warning("装备类型 " + equipmentType + " 没有基础属性配置");
             return;
         }
 
-        pluginContext.getLogger().info("为 " + material + " (" + equipmentType + ") 应用 " + baseAttrs.size() + " 个基础属性");
+        logger.info("为 " + material + " (" + equipmentType + ") 应用 " + baseAttrs.size() + " 个基础属性");
 
-        for (Map.Entry<String, Double> attribute : pluginContext.getBaseAttributeManager().getBaseAttributes(material).entrySet()){
+        for (Map.Entry<String, Double> attribute : baseAttributeManager.getBaseAttributes(material).entrySet()){
 
             org.bukkit.attribute.Attribute bukkitAttribute = getBukkitAttribute(attribute.getKey());
             if (bukkitAttribute == null) {
-                pluginContext.getLogger().warning("未知的基础属性: " + attribute);
+                logger.warning("未知的基础属性: " + attribute);
                 continue;
             }
-            NamespacedKey baseAttrNamespaceKey = pluginContext.createKey("ForgingEnhancement_base_" + attribute.getKey());
+
+            NamespacedKey baseAttrNamespaceKey = keyManager.createUniqueKey("ForgingEnhancement_base_" + attribute.getKey());
             // 基础属性命名ID
             switch (attribute.getKey()) {
                 case "attack_damage" -> baseAttrNamespaceKey = NamespacedKey.minecraft("base_attack_damage");
@@ -72,25 +81,25 @@ public class AttributeApplicationService {
                     material.getEquipmentSlot().getGroup()
             );
             meta.addAttributeModifier(bukkitAttribute, baseAttrModifier);
-            pluginContext.getLogger().info("应用基础属性: " + attribute.getKey() + " = " + attribute.getValue() + " (" + material.getEquipmentSlot().getGroup() + ")");
+            logger.info("应用基础属性: " + attribute.getKey() + " = " + attribute.getValue() + " (" + material.getEquipmentSlot().getGroup() + ")");
         }
     }
 
     private void applySingleAttribute(ItemMeta meta, Attribute attribute, Material material) {
-        ConfigManager.AttributeConfig config = pluginContext.getConfigManager().getAttributeConfig(attribute.getName());
+        ConfigManager.AttributeConfig config = configManager.getAttributeConfig(attribute.getName());
         if (config == null) {
-            pluginContext.getLogger().warning("未知的属性配置: " + attribute.getName());
+            logger.warning("未知的属性配置: " + attribute.getName());
             return;
         }
 
         org.bukkit.attribute.Attribute bukkitAttribute = getBukkitAttribute(attribute.getName());
         if (bukkitAttribute == null) {
-            pluginContext.getLogger().warning("未知的Bukkit属性: " + attribute.getName());
+            logger.warning("未知的Bukkit属性: " + attribute.getName());
             return;
         }
 
         // 创建唯一标识符
-        NamespacedKey modifierKey = pluginContext.createKey(attribute.getName());
+        NamespacedKey modifierKey = keyManager.createUniqueKey(attribute.getName());
 
         // 创建属性修饰符，使用原物品对应的槽位
         AttributeModifier modifier = new AttributeModifier(
@@ -131,7 +140,7 @@ public class AttributeApplicationService {
             case "submerged_mining_speed": return org.bukkit.attribute.Attribute.SUBMERGED_MINING_SPEED;
             case "block_interaction_range": return org.bukkit.attribute.Attribute.BLOCK_INTERACTION_RANGE;
             default:
-                pluginContext.getLogger().warning("不支持的属性类型: " + configKey);
+                logger.warning("不支持的属性类型: " + configKey);
                 return null;
         }
     }

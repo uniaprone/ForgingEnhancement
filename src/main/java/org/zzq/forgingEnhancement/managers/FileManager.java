@@ -1,31 +1,16 @@
-package org.zzq.forgingEnhancement.manager;
+package org.zzq.forgingEnhancement.managers;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import java.io.File;
-
 public class FileManager {
-    private static volatile FileManager instance;
+    private FileManager fileManager;
     private Plugin plugin;
     private ConfigManager configManager;
     private BaseAttributeManager baseAttributeManager;
 
-    private FileManager(Plugin plugin) {
+    public FileManager(Plugin plugin) {
         this.plugin = plugin;
         initialize();
-    }
-
-    public static FileManager getInstance(Plugin plugin) {
-        if (instance == null) {
-            synchronized (FileManager.class) {
-                if (instance == null) {
-                    instance = new FileManager(plugin);
-                }
-            }
-        }
-        return instance;
     }
 
     private void initialize(){

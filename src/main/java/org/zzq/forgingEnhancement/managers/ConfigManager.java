@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.manager;
+package org.zzq.forgingEnhancement.managers;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

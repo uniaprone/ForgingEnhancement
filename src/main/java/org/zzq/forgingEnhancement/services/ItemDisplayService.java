@@ -1,18 +1,17 @@
-package org.zzq.forgingEnhancement.Service;
+package org.zzq.forgingEnhancement.services;
 
 import org.bukkit.inventory.meta.ItemMeta;
-import org.zzq.forgingEnhancement.Listener.AnvilForgingListener;
-import org.zzq.forgingEnhancement.manager.ConfigManager;
-import org.zzq.forgingEnhancement.model.Attribute;
+import org.zzq.forgingEnhancement.managers.ConfigManager;
+import org.zzq.forgingEnhancement.models.Attribute;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class ItemDisplayService {
-    private PluginContext pluginContext;
-    public ItemDisplayService(PluginContext pluginContext){
-        this.pluginContext = pluginContext;
+    private ConfigManager configManager;
+    public ItemDisplayService(ConfigManager configManager){
+        this.configManager = configManager;
     }
 
     public void updateItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, String itemQuality, List<Attribute> enhancements) {
@@ -43,10 +42,10 @@ public class ItemDisplayService {
 
         // 添加词条信息
         for (Attribute attr : enhancements) {
-            ConfigManager.AttributeConfig config = pluginContext.getConfigManager().getAttributeConfig(attr.getName());
+            ConfigManager.AttributeConfig config = configManager.getAttributeConfig(attr.getName());
             if (config != null) {
                 String attrColor = getQualityColor(attr.getLevel());
-                String valueDisplay = formatAttributeValue(config, attr.getLevel());
+                String valueDisplay = formatAttributeValue(config, attr.getValue());
 
                 newLore.add(attrColor + config.name + ": +" + valueDisplay + " (" + getQualityDisplayName(attr.getLevel()) + ")");
             }

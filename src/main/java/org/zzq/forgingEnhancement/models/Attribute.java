@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.model;
+package org.zzq.forgingEnhancement.models;
 
 public class Attribute {
     private String name;

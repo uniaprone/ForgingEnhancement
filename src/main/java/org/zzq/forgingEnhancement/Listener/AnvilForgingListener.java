@@ -15,7 +15,6 @@ import org.zzq.forgingEnhancement.ForgingEnhancement;
 import org.zzq.forgingEnhancement.Util.RandomUtil;
 import org.zzq.forgingEnhancement.manager.BaseAttributeManager;
 import org.zzq.forgingEnhancement.manager.ConfigManager;
-import org.zzq.forgingEnhancement.manager.FileManager;
 
 import java.util.*;
 
@@ -41,7 +40,7 @@ public class AnvilForgingListener implements Listener {
         this.configManager = plugin.getFileManager().getConfigManager();
         this.baseAttributeManager = plugin.getFileManager().getBaseAttributeManager();
         this.random = new Random();
-        this.enhancementKey = new NamespacedKey(plugin, "enhancement_data");
+        this.enhancementKey = new NamespacedKey(plugin, "forging_data");
         this.baseAttributeKey = new NamespacedKey(plugin, "base_attribute_applied");
     }
 
@@ -72,17 +71,14 @@ public class AnvilForgingListener implements Listener {
                     return;
                 }
 
-
                 // 应用强化
-                ItemStack result = applyEnhancement(firstItem, finalItemQuality, commonAttributeCount);
+                ItemStack result = applyEnhancement(firstItem, firstItemType, finalItemLevel, commonAttributeCount);
 
-                if (result != null) {
-                    event.setResult(result);
-                    event.getView().setRepairCost(0);
+                event.setResult(result);
+                event.getView().setRepairCost(0);
 
-                    plugin.getLogger().info("为 " + firstItem.getType() + " 添加了 " + commonAttributeCount +
-                            " 个词条，最终品质: " + finalItemQuality);
-                }
+                plugin.getLogger().info("为 " + firstItem.getType() + " 添加了 " + commonAttributeCount +
+                        " 个词条，最终品质: " + finalItemQuality);
             }
         }
     }
@@ -102,7 +98,7 @@ public class AnvilForgingListener implements Listener {
         }
     }
 
-    private ItemStack applyEnhancement(ItemStack originalItem, String itemQuality, int attributeCount) {
+    private ItemStack applyEnhancement(ItemStack originalItem, String itemType,int itemLevel, int attributeCount) {
         // 1. 完全克隆原物品，包括所有NBT数据
         ItemStack result = originalItem.clone();
 
@@ -118,22 +114,15 @@ public class AnvilForgingListener implements Listener {
             return originalItem.clone();
         }
 
-        // 4. 如果是0词条，只添加品质显示
-        if (attributeCount == 0) {
-            return applyZeroAttributeEnhancement(result, itemQuality);
-        }
-
-        // 5. 获取装备类型和可用属性
-        String equipmentType = configManager.getEquipmentType(result.getType());
-        if (equipmentType == null) {
-            plugin.getLogger().warning("无法确定装备类型: " + result.getType());
-            return originalItem.clone();
-        }
-
-        List<String> availableAttributes = new ArrayList<>(configManager.getAttributesForEquipment(equipmentType));
+        List<String> availableAttributes = configManager.getEquipmentCommonAttributes(itemType);
         if (availableAttributes.isEmpty()) {
-            plugin.getLogger().warning("装备类型 " + equipmentType + " 没有可用的属性");
+            plugin.getLogger().warning("装备类型 " + itemType + " 没有可用的属性");
             return originalItem.clone();
+        }
+        //应用基础属性
+        if (!hasBaseAttributeApplied(newMeta)) {
+            applyBaseAttributes(newMeta, result.getType());
+            markBaseAttributeApplied(newMeta);
         }
 
         // 6. 确保属性数量不超过可用属性
@@ -144,33 +133,27 @@ public class AnvilForgingListener implements Listener {
         List<String> selectedAttributes = availableAttributes.subList(0, attributeCount);
 
         // 8. 计算词条品质分布
-        List<EnhancementAttribute> enhancements = calculateAttributeQualities(selectedAttributes, itemQuality, attributeCount);
+        List<EnhancementAttribute> enhancements = calculateAttributeQualities(selectedAttributes, itemLevel, attributeCount);
 
+        // 添加稀有词条
+        List<String> rareAttributes = configManager.getEquipmentRareAttributes(itemType);
+        if (!rareAttributes.isEmpty()) {
+            for (String rareAttribute : rareAttributes) {
+                if (random.nextDouble() < configManager.getRareChance()) {
+                    enhancements.add(new EnhancementAttribute(rareAttribute, levelQualityMap.get(itemLevel), configManager.getAttributeConfig(rareAttribute).values.get(levelQualityMap.get(itemLevel)).min));
+                }
+            }
+        }
         // 9. 应用所有新词条（不修改原有属性）
         for (EnhancementAttribute enh : enhancements) {
-            applySingleAttribute(newMeta, enh, equipmentType, result.getType());
+            applySingleAttribute(newMeta, enh, result.getType());
         }
-        result.setItemMeta(newMeta);
-        plugin.getLogger().warning("基础属性判断");
-        Objects.requireNonNull(result.getItemMeta().getAttributeModifiers()).forEach((attribute, modifiers) -> {
-            if (attribute != null) {
-                plugin.getLogger().warning("基础属性：" + attribute.getKey());
-            }
-        });
-        plugin.getLogger().warning("基础属性结束");
-        // 3. 应用基础属性（如果尚未应用）
-
-        if (!hasBaseAttributeApplied(newMeta)) {
-            applyBaseAttributes(newMeta, result.getType());
-            markBaseAttributeApplied(newMeta);
-        }
-
 
         // 10. 存储强化数据到NBT
-        storeEnhancementData(newMeta, itemQuality, enhancements);
+        storeEnhancementData(newMeta, levelQualityMap.get(itemLevel), enhancements);
 
         // 11. 更新物品显示（保留所有原有Lore）
-        updateItemDisplay(newMeta, originalMeta, itemQuality, enhancements);
+        updateItemDisplay(newMeta, originalMeta, levelQualityMap.get(itemLevel), enhancements);
 
         result.setItemMeta(newMeta);
         return result;
@@ -228,7 +211,7 @@ public class AnvilForgingListener implements Listener {
             plugin.getLogger().info("应用基础属性: " + attribute.getKey() + " = " + attribute.getValue() + " (" + material.getEquipmentSlot().getGroup() + ")");
         }
     }
-    private void applySingleAttribute(ItemMeta meta, EnhancementAttribute enhancement, String equipmentType, Material material) {
+    private void applySingleAttribute(ItemMeta meta, EnhancementAttribute enhancement, Material material) {
         ConfigManager.AttributeConfig config = configManager.getAttributeConfig(enhancement.attributeKey);
         if (config == null) {
             plugin.getLogger().warning("未知的属性配置: " + enhancement.attributeKey);
@@ -243,7 +226,7 @@ public class AnvilForgingListener implements Listener {
 
         // 创建唯一标识符
         NamespacedKey modifierKey = new NamespacedKey(plugin,
-                "enhancement_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 6));
+                enhancement.attributeKey + System.currentTimeMillis());
 
         // 创建属性修饰符，使用原物品对应的槽位
         AttributeModifier modifier = new AttributeModifier(
@@ -257,30 +240,6 @@ public class AnvilForgingListener implements Listener {
         meta.addAttributeModifier(bukkitAttribute, modifier);
     }
 
-    private ItemStack applyZeroAttributeEnhancement(ItemStack originalItem, String itemQuality) {
-        ItemStack result = originalItem.clone();
-        ItemMeta originalMeta = originalItem.getItemMeta();
-        ItemMeta newMeta = result.getItemMeta();
-
-        if (originalMeta == null || newMeta == null) {
-            return originalItem.clone();
-        }
-
-        // 应用基础属性（如果尚未应用）
-        if (!hasBaseAttributeApplied(newMeta)) {
-            applyBaseAttributes(newMeta, result.getType());
-            markBaseAttributeApplied(newMeta);
-        }
-
-        // 存储基础强化数据
-        storeBasicEnhancementData(newMeta, itemQuality);
-
-        // 更新显示
-        updateBasicItemDisplay(newMeta, originalMeta, itemQuality);
-
-        result.setItemMeta(newMeta);
-        return result;
-    }
     private boolean hasBaseAttributeApplied(ItemMeta meta) {
         return meta.getPersistentDataContainer().get(baseAttributeKey, PersistentDataType.BYTE) != null;
     }
@@ -317,9 +276,8 @@ public class AnvilForgingListener implements Listener {
         newMeta.setLore(newLore);
     }
 
-    private List<EnhancementAttribute> calculateAttributeQualities(List<String> attributes, String itemQuality, int attributeCount) {
+    private List<EnhancementAttribute> calculateAttributeQualities(List<String> attributes, int itemQualityLevel, int attributeCount) {
         List<EnhancementAttribute> enhancements = new ArrayList<>();
-        int itemQualityLevel = getLevelByQuality(itemQuality);
 
         // 计算总品质点数（每个词条基础为物品品质等级）
         int totalQualityPoints = itemQualityLevel * attributeCount;
@@ -398,11 +356,6 @@ public class AnvilForgingListener implements Listener {
         dataBuilder.append("]}");
 
         meta.getPersistentDataContainer().set(enhancementKey, PersistentDataType.STRING, dataBuilder.toString());
-    }
-
-    private void storeBasicEnhancementData(ItemMeta meta, String itemQuality) {
-        String data = "{\"quality\":\"" + itemQuality + "\",\"attributes\":[]}";
-        meta.getPersistentDataContainer().set(enhancementKey, PersistentDataType.STRING, data);
     }
 
     private void updateItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, String itemQuality, List<EnhancementAttribute> enhancements) {
@@ -489,13 +442,6 @@ public class AnvilForgingListener implements Listener {
             }
         }
         return 0;
-    }
-
-    public boolean hasEnhancement(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return false;
-        ItemMeta meta = item.getItemMeta();
-        String enhancementData = meta.getPersistentDataContainer().get(enhancementKey, PersistentDataType.STRING);
-        return enhancementData != null && !enhancementData.isEmpty();
     }
 
     private Attribute getBukkitAttribute(String configKey) {

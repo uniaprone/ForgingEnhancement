@@ -194,7 +194,7 @@ public class ConfigManager {
     }
 
     public List<String> getEquipmentCommonAttributes(String type){
-        List<String> equipmentCommonAttributes = attributePool.get(type);
+        List<String> equipmentCommonAttributes = new ArrayList<>(attributePool.get(type));
         Iterator<String> iterable = equipmentCommonAttributes.iterator();
         while(iterable.hasNext()){
             String currentAttribute = iterable.next();
@@ -206,7 +206,7 @@ public class ConfigManager {
     }
 
     public List<String> getEquipmentRareAttributes(String type){
-        List<String> equipmentCommonAttributes = attributePool.get(type);
+        List<String> equipmentCommonAttributes = new ArrayList<>(attributePool.get(type));
         Iterator<String> iterable = equipmentCommonAttributes.iterator();
         while(iterable.hasNext()){
             String currentAttribute = iterable.next();
@@ -215,5 +215,9 @@ public class ConfigManager {
             }
         }
         return equipmentCommonAttributes;
+    }
+
+    public double getRareChance() {
+        return rareChance;
     }
 }

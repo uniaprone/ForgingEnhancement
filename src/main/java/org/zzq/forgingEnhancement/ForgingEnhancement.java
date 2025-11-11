@@ -7,7 +7,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.zzq.forgingEnhancement.Listener.AnvilClickListener;
 import org.zzq.forgingEnhancement.Listener.AnvilForgingListener;
+import org.zzq.forgingEnhancement.Service.PluginContext;
 import org.zzq.forgingEnhancement.manager.FileManager;
 
 import java.util.HashMap;
@@ -22,6 +24,8 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     // NBT标签键
     private NamespacedKey forgingStoneKey;
     private NamespacedKey stoneQualityKey;
+    private NamespacedKey enhancementKey;
+    private NamespacedKey baseAttributeKey;
 
     // 品质到CustomModelData的映射
     private final Map<String, Integer> qualityToModelData = new HashMap<>();
@@ -31,17 +35,22 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         this.fileManager = FileManager.getInstance(this);
+        PluginContext context = new PluginContext(this);
         this.random = new Random();
 
         // 初始化NBT键
         this.forgingStoneKey = new NamespacedKey(this, "forging_stone");
         this.stoneQualityKey = new NamespacedKey(this, "stone_quality");
+        this.enhancementKey = new NamespacedKey(this, "forging_data");
+        this.baseAttributeKey = new NamespacedKey(this, "base_attribute_applied");
+
 
         // 初始化品质映射
         initializeQualityMappings();
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new AnvilForgingListener(this), this);
+        getServer().getPluginManager().registerEvents(new AnvilClickListener(context), this);
 
         // 创建命令执行器实例
         ForgingEnhancementCommand commandExecutor = new ForgingEnhancementCommand(this);
@@ -110,7 +119,6 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     // 验证是否为锻造石
     public boolean isForgingStone(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
-
         ItemMeta meta = item.getItemMeta();
         Byte isStone = meta.getPersistentDataContainer().get(forgingStoneKey, PersistentDataType.BYTE);
         return isStone != null && isStone == 1;
@@ -119,7 +127,6 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     // 获取锻造石品质
     public String getStoneQuality(ItemStack stone) {
         if (!isForgingStone(stone)) return null;
-
         ItemMeta meta = stone.getItemMeta();
         return meta.getPersistentDataContainer().get(stoneQualityKey, PersistentDataType.STRING);
     }
@@ -153,5 +160,13 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     public Map<String, String> getQualityDisplayNames() {
         return new HashMap<>(qualityDisplayNames);
+    }
+
+    public NamespacedKey getEnhancementKey() {
+        return enhancementKey;
+    }
+
+    public NamespacedKey getBaseAttributeKey() {
+        return baseAttributeKey;
     }
 }

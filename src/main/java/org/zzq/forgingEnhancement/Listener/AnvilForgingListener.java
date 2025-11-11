@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.zzq.forgingEnhancement.ForgingEnhancement;
+import org.zzq.forgingEnhancement.Util.RandomUtil;
 import org.zzq.forgingEnhancement.manager.BaseAttributeManager;
 import org.zzq.forgingEnhancement.manager.ConfigManager;
 import org.zzq.forgingEnhancement.manager.FileManager;
@@ -53,33 +54,33 @@ public class AnvilForgingListener implements Listener {
 
         if (firstItem != null && secondItem != null && isForgingStone(secondItem)) {
             String firstItemType = configManager.getEquipmentType(firstItem.getType());
-            plugin.getLogger().warning(
-                    "物品名:" + firstItem.getType() + "类型" + firstItemType + "是否可强化" + configManager.isEnhanceableEquipment(firstItemType));
             if (configManager.isEnhanceableEquipment(firstItemType)) {
                 // 获取锻造石对应的品质
                 String baseQuality = plugin.getStoneQuality(secondItem);
+                int baseLevel = getLevelByQuality(baseQuality);
                 // 对品质进行再随机
-                String finalItemQuality = randomizeQuality(baseQuality);
+                int finalItemLevel = RandomUtil.normalDistribution(baseLevel, levelQualityMap.size() - 1);
+                String finalItemQuality = levelQualityMap.get(finalItemLevel);
 
                 // 确定词条数量
-                int maxAttributes = configManager.getEquipmentCommonAttributes(firstItemType).size();
-                int attributeCount = calculateAttributeCount(baseQuality, maxAttributes);
-                plugin.getLogger().warning(
-                        "物品名:" + firstItem.getType() + "类型" + firstItemType + "品质:" + finalItemQuality +  "最大词条数:" + maxAttributes +  "无法获取词条数量" + attributeCount
-                );
-                if(attributeCount == -1){
+                int maxCommonAttributes = configManager.getEquipmentCommonAttributes(firstItemType).size();
+                int commonAttributeCount = calculateAttributeCount(baseQuality, maxCommonAttributes);
+                if(commonAttributeCount == -1){
                     plugin.getLogger().warning(
-                            "物品名:" + firstItem.getType() + "类型" + firstItemType + "品质:" + finalItemQuality +  "最大词条数:" + maxAttributes +  "无法获取词条数量"
+                            "物品名:" + firstItem.getType() + "类型" + firstItemType + "品质:" + finalItemQuality +  "最大词条数:" + maxCommonAttributes +  "无法获取词条数量"
                     );
+                    return;
                 }
+
+
                 // 应用强化
-                ItemStack result = applyEnhancement(firstItem, finalItemQuality, attributeCount);
+                ItemStack result = applyEnhancement(firstItem, finalItemQuality, commonAttributeCount);
 
                 if (result != null) {
                     event.setResult(result);
                     event.getView().setRepairCost(0);
 
-                    plugin.getLogger().info("为 " + firstItem.getType() + " 添加了 " + attributeCount +
+                    plugin.getLogger().info("为 " + firstItem.getType() + " 添加了 " + commonAttributeCount +
                             " 个词条，最终品质: " + finalItemQuality);
                 }
             }
@@ -99,26 +100,6 @@ public class AnvilForgingListener implements Listener {
             default:
                 return -1;
         }
-    }
-    private String randomizeQuality(String baseQuality) {
-        int baseLevel =getLevelByQuality(baseQuality);
-        int maxLevel = levelQualityMap.size() - 1;
-
-        // 使用正态分布，均值为基础品质等级，标准差为1.0
-        double mean = baseLevel;
-        double standardDeviation = 0.6;
-
-        double gaussianValue;
-        int newLevel;
-
-        // 使用截断正态分布，确保结果在合理范围内
-        do {
-            gaussianValue = random.nextGaussian();
-            double adjustedValue = mean + standardDeviation * gaussianValue;
-            newLevel = (int) Math.round(adjustedValue);
-        } while (newLevel < 0 || newLevel > maxLevel);
-
-        return levelQualityMap.get(newLevel);
     }
 
     private ItemStack applyEnhancement(ItemStack originalItem, String itemQuality, int attributeCount) {

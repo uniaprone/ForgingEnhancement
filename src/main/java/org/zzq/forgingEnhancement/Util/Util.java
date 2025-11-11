@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement;
+package org.zzq.forgingEnhancement.Util;
 
 public class Util {
     public static String getEquipmentType(String name) {

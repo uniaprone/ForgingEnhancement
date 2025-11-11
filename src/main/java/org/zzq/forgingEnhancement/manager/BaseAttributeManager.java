@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.zzq.forgingEnhancement.Util;
+import org.zzq.forgingEnhancement.Util.Util;
 
 import java.io.File;
 import java.util.*;

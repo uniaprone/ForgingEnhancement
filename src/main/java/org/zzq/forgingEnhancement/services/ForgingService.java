@@ -69,7 +69,7 @@ public class ForgingService {
             }
             attributeService.applyExtraAttributes(resultItemMeta, resultItem.getType(), enhancementResult.getAttributeList());
             nbtService.storeForgingNBT(resultItemMeta, keyManager.getEnhancementKey(), enhancementResult);
-            itemDisplayService.updateItemDisplay(resultItemMeta, resultItem.getItemMeta(), baseQuality, enhancementResult.getAttributeList());
+            itemDisplayService.updateItemDisplay(resultItemMeta, resultItem.getItemMeta(), enhancementResult.getLevel(), enhancementResult.getAttributeList());
             resultItem.setItemMeta(resultItemMeta);
             return resultItem;
         }

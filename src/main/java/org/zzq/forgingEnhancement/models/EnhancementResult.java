@@ -14,4 +14,8 @@ public class EnhancementResult {
     public List<Attribute> getAttributeList() {
         return attributeList;
     }
+
+    public int getLevel() {
+        return level;
+    }
 }

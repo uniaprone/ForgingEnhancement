@@ -17,7 +17,7 @@ public class ItemDisplayService {
         this.regxService = regxService;
     }
 
-    public void updateItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, String itemQuality, List<Attribute> enhancements) {
+    public void updateItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel, List<Attribute> enhancements) {
         // 获取原有Lore
         List<String> originalLore = originalMeta.hasLore() ? originalMeta.getLore() : new ArrayList<>();
         if (originalLore == null) originalLore = new ArrayList<>();
@@ -28,8 +28,8 @@ public class ItemDisplayService {
         List<String> newLore = new ArrayList<>(originalLore);
 
         // 添加品质信息
-        String qualityColor = getQualityColor(itemQuality);
-        newLore.add(qualityColor + "品质: " + "『" + getQualityDisplayName(itemQuality) + "』");
+        String qualityColor = getQualityColor(itemQualityLevel);
+        newLore.add(qualityColor + "品质: " + "『" + getQualityDisplayName(itemQualityLevel) + "』");
 
         // 添加词条信息
         for (Attribute attr : enhancements) {
@@ -53,10 +53,6 @@ public class ItemDisplayService {
                 iterator.remove();
             }
         }
-    }
-
-    private void loraRegx(){
-
     }
 
     private String formatAttributeValue(ConfigManager.AttributeConfig config, double value) {

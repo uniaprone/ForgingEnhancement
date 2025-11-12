@@ -76,4 +76,8 @@ public class ForgingService {
         return firstItem;
     }
 
+    public boolean isForgingStone(ItemStack item) {
+        return stoneManager.isForgingStone(item);
+    }
+
 }

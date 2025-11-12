@@ -18,34 +18,31 @@ public class AnvilClickListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getInventory().getType() != InventoryType.ANVIL) {
-            return;
-        }
-        // 只处理结果槽的点击（槽位2）
-        if (event.getRawSlot() != 2) {
+        InventoryType inventoryType = event.getInventory().getType();
+        if (inventoryType != InventoryType.ANVIL && inventoryType != InventoryType.CRAFTING) {
             return;
         }
 
-        ItemStack resultItem = event.getCurrentItem();
-        if (resultItem == null) {
-            return;
+        if(inventoryType == InventoryType.ANVIL && event.getRawSlot() == 2){
+            // 获取铁砧中的物品
+            AnvilInventory anvil = (AnvilInventory) event.getInventory();
+            ItemStack firstItem = anvil.getFirstItem();
+            ItemStack secondItem = anvil.getSecondItem();
+            ItemStack resultItem = event.getCurrentItem();
+            if (firstItem == null || secondItem == null || resultItem == null || !forgingService.isForgingStone(secondItem)) {
+                return;
+            }
+            event.setCancelled(true); // 取消默认的点击行为
+
+            ItemStack resultForgingItem = forgingService.enhanceItem(firstItem, secondItem, resultItem);
+
+            anvil.setFirstItem(null);
+            anvil.setSecondItem(consumeItem(secondItem));
+            // 手动设置光标物品
+            event.getWhoClicked().setItemOnCursor(resultForgingItem);
+            // 更新铁砧结果槽为空
+            anvil.setResult(null);
         }
-
-        event.setCancelled(true); // 取消默认的点击行为
-
-        // 获取铁砧中的物品
-        AnvilInventory anvil = (AnvilInventory) event.getInventory();
-        ItemStack firstItem = anvil.getFirstItem();
-        ItemStack secondItem = anvil.getSecondItem();
-
-        ItemStack resultForgingItem = forgingService.enhanceItem(firstItem, secondItem, resultItem);
-
-        anvil.setFirstItem(null);
-        anvil.setSecondItem(consumeItem(secondItem));
-        // 手动设置光标物品
-        event.getWhoClicked().setItemOnCursor(resultForgingItem);
-        // 更新铁砧结果槽为空
-        anvil.setResult(null);
     }
     // 消耗物品（减少数量）
     private ItemStack consumeItem(ItemStack item) {

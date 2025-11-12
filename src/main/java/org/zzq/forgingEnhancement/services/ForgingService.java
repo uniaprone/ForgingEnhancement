@@ -1,6 +1,5 @@
 package org.zzq.forgingEnhancement.services;
 
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.slf4j.LoggerFactory;
@@ -9,8 +8,6 @@ import org.zzq.forgingEnhancement.managers.KeyManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
 
-import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 public class ForgingService {
@@ -41,39 +38,32 @@ public class ForgingService {
         this.keyManager = keyManager;
         this.logger = logger;
     }
-    public ItemStack enhanceItem(ItemStack firstItem, ItemStack secondItem, ItemStack resultItem){
+    public ItemStack enhanceItem(ItemStack resultItem, ItemStack forgingStone){
         ItemMeta resultItemMeta = resultItem.getItemMeta();
-//        if(resultItemMeta != null && resultItemMeta.hasAttributeModifiers()){
-//            for (Map.Entry<org.bukkit.attribute.Attribute, AttributeModifier> entry : Objects.requireNonNull(resultItemMeta.getAttributeModifiers()).entries()) {
-//                logger.info(entry.getKey() + ":" + entry.getValue().getAmount());
-//                logger.info(entry.getValue().getName() +"^^^"+ entry.getValue().getKey() +"^^^"+ entry.getValue());
-//                logger.info(entry.getValue() + "");
-//                logger.info(entry + "");
-//            }
-//        }
-        if (firstItem == null || secondItem == null || !stoneManager.isForgingStone(secondItem)) {
-            return firstItem;
-        }
 
-        if(configManager.isEnhanceableEquipment(firstItem.getType())) {
-            String baseQuality = stoneManager.getStoneQuality(secondItem);
-            int baseLevel = configManager.getLevelByQuality(baseQuality);
-            if(nbtService.hasForgingNBT(resultItemMeta)){
-                nbtService.removeForgingNBT(resultItemMeta);
-                attributeService.removeForgingAttributes(resultItemMeta);
-            }
-            EnhancementResult enhancementResult = enhancementService.enhance(firstItem, baseLevel);
-            if (!nbtService.hasBaseAttributeApplied(resultItemMeta)) {
-                attributeService.applyBaseAttributes(resultItemMeta, resultItem.getType());
-                nbtService.markBaseAttributeApplied(resultItemMeta);
-            }
-            attributeService.applyExtraAttributes(resultItemMeta, resultItem.getType(), enhancementResult.getAttributeList());
-            nbtService.storeForgingNBT(resultItemMeta, keyManager.getEnhancementKey(), enhancementResult);
-            itemDisplayService.updateItemDisplay(resultItemMeta, resultItem.getItemMeta(), enhancementResult.getLevel(), enhancementResult.getAttributeList());
-            resultItem.setItemMeta(resultItemMeta);
-            return resultItem;
+        int baseLevel = stoneManager.getStoneQualityLevel(forgingStone);
+        //1.判断是否是重铸
+        if(nbtService.hasForgingNBT(resultItemMeta)){
+            nbtService.removeForgingNBT(resultItemMeta);
+            attributeService.removeForgingAttributes(resultItemMeta);
         }
-        return firstItem;
+        //2.强化
+        EnhancementResult enhancementResult = enhancementService.enhance(resultItem, baseLevel);
+        //3.判断是否有基础属性
+        if (!nbtService.hasBaseAttributeApplied(resultItemMeta)) {
+            attributeService.applyBaseAttributes(resultItemMeta, resultItem.getType());
+            nbtService.markBaseAttributeApplied(resultItemMeta);
+        }
+        //4.添加锻造属性
+        attributeService.applyExtraAttributes(resultItemMeta, resultItem.getType(), enhancementResult.getAttributeList());
+        //5.存储锻造数据
+        nbtService.storeForgingNBT(resultItemMeta, keyManager.getEnhancementKey(), enhancementResult);
+        //6.更新显示
+        itemDisplayService.updateItemDisplay(resultItemMeta, resultItem.getItemMeta(), enhancementResult.getLevel(), enhancementResult.getAttributeList());
+        //7.应用强化
+        resultItem.setItemMeta(resultItemMeta);
+        //8.返回强化后的物品
+        return resultItem;
     }
 
     public boolean isForgingStone(ItemStack item) {

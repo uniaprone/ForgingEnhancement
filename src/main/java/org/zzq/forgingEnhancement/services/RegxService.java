@@ -7,15 +7,16 @@ import java.util.regex.Pattern;
 
 public class RegxService {
     private Logger logger;
-    private Pattern qualityPattern = Pattern.compile("^.*品质: 『([\\s\\S]{2})』$");
-    private Pattern attributePattern = Pattern.compile("^.*: [+\\-]\\d+\\.\\d+%? 『([\\s\\S]{2})』$");
-
+    private static final Pattern unknowPattern = Pattern.compile("^.*品质: \\?\\?\\?$");
+    private static final Pattern qualityPattern = Pattern.compile("^.*品质: 『([\\s\\S]{2})』$");
+    private static final Pattern attributePattern = Pattern.compile("^.*: [+\\-]\\d+\\.\\d+%? 『([\\s\\S]{2})』$");
+    private List<Pattern> patterns = List.of(unknowPattern,qualityPattern,attributePattern);
     public RegxService(Logger logger){
         this.logger = logger;
     }
 
     public boolean loraDetection(String str){
-        List<Pattern> patterns = List.of(qualityPattern,attributePattern);
+
         for (Pattern pattern : patterns) {
             Matcher matcher = pattern.matcher(str);
             if(matcher.matches()){

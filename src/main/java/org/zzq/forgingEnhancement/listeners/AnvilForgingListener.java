@@ -1,19 +1,14 @@
 package org.zzq.forgingEnhancement.listeners;
 
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.zzq.forgingEnhancement.ForgingEnhancement;
-import org.zzq.forgingEnhancement.managers.BaseAttributeManager;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
 import org.zzq.forgingEnhancement.services.ItemDisplayService;
-
-import java.util.*;
 
 public class AnvilForgingListener implements Listener {
     private final ConfigManager configManager;
@@ -38,7 +33,7 @@ public class AnvilForgingListener implements Listener {
             if (configManager.isEnhanceableEquipment(firstItemType)) {
                 ItemStack result = firstItem.clone();
                 ItemMeta resultItemMeta = result.getItemMeta();
-                itemDisplayService.updatePrepareAnvilDisplay(resultItemMeta, firstItem.getItemMeta(), configManager.getLevelByQuality(stoneManager.getStoneQuality(secondItem)));
+                itemDisplayService.updatePrepareAnvilDisplay(resultItemMeta, firstItem.getItemMeta(), stoneManager.getStoneQualityLevel(secondItem));
                 result.setItemMeta(resultItemMeta);
                 event.setResult(result);
                 event.getView().setRepairCost(0);

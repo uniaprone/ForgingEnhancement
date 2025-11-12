@@ -1,6 +1,7 @@
 package org.zzq.forgingEnhancement.services;
 
 import org.bukkit.inventory.ItemStack;
+import org.zzq.forgingEnhancement.managers.StoneManager;
 import org.zzq.forgingEnhancement.utils.RandomUtil;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.models.Attribute;
@@ -9,13 +10,18 @@ import org.zzq.forgingEnhancement.models.EnhancementResult;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class EnhancementService {
     private final Random random;
     private ConfigManager configManager;
-    public EnhancementService(ConfigManager configManager) {
+    private StoneManager stoneManager;
+    private Logger logger;
+    public EnhancementService(ConfigManager configManager, StoneManager stoneManager, Logger logger) {
         this.random = new Random();
         this.configManager = configManager;
+        this.stoneManager = stoneManager;
+        this.logger = logger;
     }
 
     /**
@@ -29,7 +35,7 @@ public class EnhancementService {
         // 获取装备类型
         String itemType = configManager.getEquipmentType(item.getType());
         // 计算最终强化等级（基于正态分布）
-        int finalItemLevel = RandomUtil.normalDistribution(stoneLevel, configManager.getLevelQualityMap().size() - 1);
+        int finalItemLevel = RandomUtil.normalDistribution(stoneLevel, stoneManager.getLevelQualityMap().size() - 1);
 
         // 计算并选择普通属性
         int maxCommonAttributes = configManager.getEquipmentCommonAttributes(itemType).size();
@@ -49,11 +55,13 @@ public class EnhancementService {
         if (!rareAttributes.isEmpty()) {
             for (String rareAttribute : rareAttributes) {
                 // 根据稀有概率决定是否添加稀有属性
-                if (random.nextDouble() < configManager.getRareChance()) {
+                double randomValue = random.nextDouble();
+                if (randomValue < 0.1 + (double)(finalItemLevel + 1) / 20.0){
+                    logger.info("随机值" + randomValue + "应用稀有属性" + rareAttribute + "等级" + finalItemLevel);
                     // 添加稀有属性，使用最小属性值
                     enhancements.add(new Attribute(rareAttribute, finalItemLevel,
                             configManager.getAttributeConfig(rareAttribute).values.get(
-                                    configManager.getLevelQualityMap().get(finalItemLevel)).min));
+                                   stoneManager.getLevelQualityMap().get(finalItemLevel)).min));
                 }
             }
         }
@@ -106,7 +114,7 @@ public class EnhancementService {
         // 创建增强属性对象
         for (int i = 0; i < attributeCount; i++) {
             String attributeKey = attributes.get(i);
-            String quality = configManager.getLevelQualityMap().get(attributeLevels[i]);
+            String quality = stoneManager.getLevelQualityMap().get(attributeLevels[i]);
 
             ConfigManager.AttributeConfig attrConfig = configManager.getAttributeConfig(attributeKey);
             if (attrConfig != null) {
@@ -122,7 +130,7 @@ public class EnhancementService {
 
     private boolean canAdjustQuality(int currentLevel, int adjustment) {
         int newLevel = currentLevel + adjustment;
-        return newLevel >= 0 && newLevel < configManager.getLevelQualityMap().size();
+        return newLevel >= 0 && newLevel < stoneManager.getLevelQualityMap().size();
     }
 
     private double calculateAttributeValue(ConfigManager.AttributeConfig config, String quality) {

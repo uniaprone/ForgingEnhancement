@@ -14,6 +14,14 @@ public class StoneManager {
     private final Map<String, Integer> qualityToModelData = new HashMap<>();
     // 品质显示名称映射
     private final Map<String, String> qualityDisplayNames = new HashMap<>();
+    private final Map<Integer, String> levelQualityMap = Map.of(
+            0, "BROKEN",
+            1, "COMMON",
+            2, "UNCOMMON",
+            3, "EPIC",
+            4, "LEGENDARY",
+            5, "MYTHIC"
+    );
 
     public StoneManager(KeyManager keyManager){
         this.keyManager = keyManager;
@@ -39,6 +47,7 @@ public class StoneManager {
     }
 
     public ItemStack createForgingStone(String quality, int amount) {
+        int stoneLevel = getLevelByQuality(quality);
         ItemStack stone = new ItemStack(Material.NETHER_STAR, amount);
         ItemMeta meta = stone.getItemMeta();
 
@@ -51,17 +60,17 @@ public class StoneManager {
         }
 
         // 设置显示名称和Lore
-        String displayName = getQualityColor(quality) + qualityDisplayNames.get(quality) + "锻造石";
+        String displayName = getQualityColor(stoneLevel) + qualityDisplayNames.get(quality) + "锻造石";
         meta.setDisplayName(displayName);
 
         java.util.List<String> lore = new java.util.ArrayList<>();
         lore.add("§7用于在铁砧中强化装备");
-        lore.add(getQualityColor(quality) + "品质: " + qualityDisplayNames.get(quality));
+        lore.add(getQualityColor(stoneLevel) + "品质: " + qualityDisplayNames.get(quality));
         meta.setLore(lore);
 
         // 添加NBT标签（服务器逻辑验证）
         meta.getPersistentDataContainer().set(keyManager.getForgingStoneKey(), PersistentDataType.BYTE, (byte) 1);
-        meta.getPersistentDataContainer().set(keyManager.getStoneQualityKey(), PersistentDataType.STRING, quality);
+        meta.getPersistentDataContainer().set(keyManager.getStoneQualityKey(), PersistentDataType.INTEGER, stoneLevel);
 
         stone.setItemMeta(meta);
         return stone;
@@ -78,6 +87,22 @@ public class StoneManager {
             case "MYTHIC": return "§d";
             default: return "§f";
         }
+    }
+
+    public String getQualityColor(int stoneLevel) {
+        switch (stoneLevel) {
+            case 0: return "§8";
+            case 1: return "§f";     // 白色
+            case 2: return "§a";   // 绿色
+            case 3: return "§5";       // 紫色
+            case 4: return "§6";  // 金色
+            case 5: return "§d";
+            default: return "§f";
+        }
+    }
+
+    public Map<Integer, String> getLevelQualityMap() {
+        return levelQualityMap;
     }
 
     public Map<String, Integer> getQualityToModelData() {
@@ -97,9 +122,22 @@ public class StoneManager {
     }
 
     // 获取锻造石品质
-    public String getStoneQuality(ItemStack stone) {
-        if (!isForgingStone(stone)) return null;
+    public int getStoneQualityLevel(ItemStack stone) {
+        int stoneLevel = -1;
+        if (!isForgingStone(stone)) return stoneLevel;
         ItemMeta meta = stone.getItemMeta();
-        return meta.getPersistentDataContainer().get(keyManager.getStoneQualityKey(), PersistentDataType.STRING);
+        if(meta.getPersistentDataContainer().has(keyManager.getStoneQualityKey(), PersistentDataType.INTEGER)){
+            stoneLevel = meta.getPersistentDataContainer().get(keyManager.getStoneQualityKey(), PersistentDataType.INTEGER);
+        }
+        return stoneLevel;
+    }
+
+    public int getLevelByQuality(String quality){
+        for (int i = 0; i < levelQualityMap.size(); i++) {
+            if(levelQualityMap.get(i).equals(quality)){
+                return i;
+            }
+        }
+        return 0;
     }
 }

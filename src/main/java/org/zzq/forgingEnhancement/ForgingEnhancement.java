@@ -40,7 +40,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         RegxService regxService = new RegxService(this.getLogger());
 
         AttributeService attributeService = new AttributeService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
-        EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager());
+        EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager(), stoneManager,this.getLogger());
         itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService);
         NBTService nbtService = new NBTService(keyManager);
         this.forgingService = new ForgingService(

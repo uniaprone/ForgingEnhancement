@@ -23,19 +23,6 @@ public class ConfigManager {
     private Map<String, AttributeConfig> attributes;
     private Map<String, EquipmentSlotGroup> equipmentSlots;
 
-    private final Map<Integer, String> levelQualityMap = Map.of(
-            0, "BROKEN",
-            1, "COMMON",
-            2, "UNCOMMON",
-            3, "EPIC",
-            4, "LEGENDARY",
-            5, "MYTHIC"
-    );
-
-    public Map<Integer, String> getLevelQualityMap() {
-        return levelQualityMap;
-    }
-
     // 内部类用于存储属性配置
     public static class AttributeConfig {
         public String name;
@@ -232,14 +219,5 @@ public class ConfigManager {
 
     public double getRareChance() {
         return rareChance;
-    }
-
-    public int getLevelByQuality(String quality){
-        for (int i = 0; i < levelQualityMap.size(); i++) {
-            if(levelQualityMap.get(i).equals(quality)){
-                return i;
-            }
-        }
-        return 0;
     }
 }

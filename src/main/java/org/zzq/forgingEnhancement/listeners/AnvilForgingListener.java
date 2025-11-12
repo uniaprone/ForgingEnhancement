@@ -6,20 +6,24 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.ForgingEnhancement;
 import org.zzq.forgingEnhancement.managers.BaseAttributeManager;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
+import org.zzq.forgingEnhancement.services.ItemDisplayService;
 
 import java.util.*;
 
 public class AnvilForgingListener implements Listener {
     private final ConfigManager configManager;
     private final StoneManager stoneManager;
+    private ItemDisplayService itemDisplayService;
     
-    public AnvilForgingListener(ConfigManager configManager, StoneManager stoneManager) {
+    public AnvilForgingListener(ConfigManager configManager, StoneManager stoneManager, ItemDisplayService itemDisplayService) {
         this.configManager = configManager;
         this.stoneManager = stoneManager;
+        this.itemDisplayService = itemDisplayService;
     }
 
     // 修改onPrepareAnvil方法中的锻造石识别部分
@@ -33,7 +37,9 @@ public class AnvilForgingListener implements Listener {
             String firstItemType = configManager.getEquipmentType(firstItem.getType());
             if (configManager.isEnhanceableEquipment(firstItemType)) {
                 ItemStack result = firstItem.clone();
-
+                ItemMeta resultItemMeta = result.getItemMeta();
+                itemDisplayService.updatePrepareAnvilDisplay(resultItemMeta, firstItem.getItemMeta(), configManager.getLevelByQuality(stoneManager.getStoneQuality(secondItem)));
+                result.setItemMeta(resultItemMeta);
                 event.setResult(result);
                 event.getView().setRepairCost(0);
             }

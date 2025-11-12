@@ -16,6 +16,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     private KeyManager keyManager;
     private StoneManager stoneManager;
     private ForgingService forgingService;
+    private ItemDisplayService itemDisplayService;
 
     @Override
     public void onEnable() {
@@ -39,7 +40,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
         AttributeService attributeService = new AttributeService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
         EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager());
-        ItemDisplayService itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService);
+        itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService);
         NBTService nbtService = new NBTService(keyManager);
         this.forgingService = new ForgingService(
                 attributeService,
@@ -54,7 +55,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     private void registerListeners(){
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new AnvilForgingListener(fileManager.getConfigManager(), stoneManager), this);
+        getServer().getPluginManager().registerEvents(new AnvilForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService), this);
         getServer().getPluginManager().registerEvents(new AnvilClickListener(forgingService), this);
     }
 

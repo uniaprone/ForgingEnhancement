@@ -25,7 +25,7 @@ public class ItemDisplayService {
         // 移除之前由本插件添加的强化信息（如果有的话）
         removeOldForgingLore(originalLore);
 
-        List<String> newLore = new ArrayList<>(originalLore);
+        List<String> newLore = new ArrayList<>();
 
         // 添加品质信息
         String qualityColor = getQualityColor(itemQualityLevel);
@@ -45,7 +45,24 @@ public class ItemDisplayService {
 
             }
         }
+        newLore.addAll(originalLore);
+        newMeta.setLore(newLore);
+    }
 
+    public void updatePrepareAnvilDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel){
+        // 获取原有Lore
+        List<String> originalLore = originalMeta.hasLore() ? originalMeta.getLore() : new ArrayList<>();
+        if (originalLore == null) originalLore = new ArrayList<>();
+
+        // 移除之前由本插件添加的强化信息（如果有的话）
+        removeOldForgingLore(originalLore);
+
+        List<String> newLore = new ArrayList<>();
+
+        // 添加品质信息
+        String qualityColor = getQualityColor(itemQualityLevel);
+        newLore.add(qualityColor + "品质: " + "???");
+        newLore.addAll(originalLore);
         newMeta.setLore(newLore);
     }
 

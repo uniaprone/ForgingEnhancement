@@ -80,4 +80,12 @@ public class ForgingService {
         return stoneManager.isForgingStone(item);
     }
 
+    public ItemStack createForgingStone(String quality, int amount) {
+        return stoneManager.createForgingStone(quality, amount);
+    }
+
+    public Logger getLogger(){
+        return logger;
+    }
+
 }

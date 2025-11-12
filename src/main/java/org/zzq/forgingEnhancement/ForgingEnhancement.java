@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.zzq.forgingEnhancement.commands.ForgingEnhancementCommand;
 import org.zzq.forgingEnhancement.listeners.AnvilClickListener;
 import org.zzq.forgingEnhancement.listeners.AnvilForgingListener;
+import org.zzq.forgingEnhancement.listeners.CraftingForgingListener;
 import org.zzq.forgingEnhancement.managers.FileManager;
 import org.zzq.forgingEnhancement.managers.KeyManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
@@ -55,6 +56,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     private void registerListeners(){
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new CraftingForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService,this.getLogger()), this);
         getServer().getPluginManager().registerEvents(new AnvilForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService), this);
         getServer().getPluginManager().registerEvents(new AnvilClickListener(forgingService), this);
     }

@@ -6,6 +6,8 @@ import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.models.Attribute;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class EnhancementService {
@@ -131,7 +133,10 @@ public class EnhancementService {
         }
 
         if (range != null) {
-            return range.min + (random.nextDouble() * (range.max - range.min));
+            double randomValue = range.min + (random.nextDouble() * (range.max - range.min));
+            BigDecimal bigDecimal = new BigDecimal(Double.toString(randomValue));
+            bigDecimal = bigDecimal.setScale(4, RoundingMode.HALF_UP);
+            return bigDecimal.doubleValue();
         }
 
         // 默认值

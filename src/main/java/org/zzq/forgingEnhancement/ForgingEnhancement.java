@@ -1,11 +1,6 @@
 package org.zzq.forgingEnhancement;
 
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.zzq.forgingEnhancement.commands.ForgingEnhancementCommand;
 import org.zzq.forgingEnhancement.listeners.AnvilClickListener;
@@ -14,10 +9,6 @@ import org.zzq.forgingEnhancement.managers.FileManager;
 import org.zzq.forgingEnhancement.managers.KeyManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
 import org.zzq.forgingEnhancement.services.*;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 public class ForgingEnhancement extends JavaPlugin implements Listener {
 
@@ -44,18 +35,21 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         getLogger().info("锻造增强插件已启用!");
     }
     private void initializeService(){
-        AttributeApplicationService attributeApplicationService = new AttributeApplicationService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
+        RegxService regxService = new RegxService(this.getLogger());
+
+        AttributeService attributeService = new AttributeService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
         EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager());
-        ItemDisplayService itemDisplayService = new ItemDisplayService(fileManager.getConfigManager());
+        ItemDisplayService itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService);
         NBTService nbtService = new NBTService(keyManager);
         this.forgingService = new ForgingService(
-                attributeApplicationService,
+                attributeService,
                 enhancementService,
                 itemDisplayService,
                 nbtService,
                 fileManager.getConfigManager(),
                 stoneManager,
-                keyManager);
+                keyManager,
+                this.getLogger());
     }
 
     private void registerListeners(){

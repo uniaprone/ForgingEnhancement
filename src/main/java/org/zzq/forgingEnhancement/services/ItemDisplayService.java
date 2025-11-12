@@ -7,11 +7,14 @@ import org.zzq.forgingEnhancement.models.Attribute;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ItemDisplayService {
     private ConfigManager configManager;
-    public ItemDisplayService(ConfigManager configManager){
+    private RegxService regxService;
+    public ItemDisplayService(ConfigManager configManager, RegxService regxService){
         this.configManager = configManager;
+        this.regxService = regxService;
     }
 
     public void updateItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, String itemQuality, List<Attribute> enhancements) {
@@ -19,26 +22,14 @@ public class ItemDisplayService {
         List<String> originalLore = originalMeta.hasLore() ? originalMeta.getLore() : new ArrayList<>();
         if (originalLore == null) originalLore = new ArrayList<>();
 
-        // 创建新的Lore列表，先添加原有Lore
-        List<String> newLore = new ArrayList<>(originalLore);
-
         // 移除之前由本插件添加的强化信息（如果有的话）
-        Iterator<String> iterator = newLore.iterator();
-        while (iterator.hasNext()) {
-            String line = iterator.next();
-            if (line.contains("品质:") || line.contains("词条:") || line.contains("未获得词条")) {
-                iterator.remove();
-            }
-        }
+        removeOldForgingLore(originalLore);
 
-        // 添加分隔线（如果原有Lore不为空）
-        if (!originalLore.isEmpty() && !enhancements.isEmpty()) {
-            newLore.add("§8§m----------------------");
-        }
+        List<String> newLore = new ArrayList<>(originalLore);
 
         // 添加品质信息
         String qualityColor = getQualityColor(itemQuality);
-        newLore.add(qualityColor + "品质: " + getQualityDisplayName(itemQuality));
+        newLore.add(qualityColor + "品质: " + "『" + getQualityDisplayName(itemQuality) + "』");
 
         // 添加词条信息
         for (Attribute attr : enhancements) {
@@ -47,12 +38,27 @@ public class ItemDisplayService {
                 String attrColor = getQualityColor(attr.getLevel());
                 String valueDisplay = formatAttributeValue(config, attr.getValue());
 
-                newLore.add(attrColor + config.name + ": +" + valueDisplay + " (" + getQualityDisplayName(attr.getLevel()) + ")");
+                newLore.add(attrColor + config.name + ": +" + valueDisplay + " 『" + getQualityDisplayName(attr.getLevel()) + "』");
             }
         }
 
         newMeta.setLore(newLore);
     }
+
+    private void removeOldForgingLore(List<String> Lore){
+        Iterator<String> iterator = Lore.iterator();
+        while (iterator.hasNext()) {
+            String line = iterator.next();
+            if(regxService.loraDetection(line)){
+                iterator.remove();
+            }
+        }
+    }
+
+    private void loraRegx(){
+
+    }
+
     private String formatAttributeValue(ConfigManager.AttributeConfig config, double value) {
         if ("ADD_NUMBER".equals(config.operation)) {
             return String.format("%.1f", value);

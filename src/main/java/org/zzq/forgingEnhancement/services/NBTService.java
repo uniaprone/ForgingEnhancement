@@ -31,4 +31,7 @@ public class NBTService {
         String AttributesString = meta.getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING);
         return gson.fromJson(AttributesString, EnhancementResult.class);
     }
+    public void removeForgingNBT(ItemMeta meta){
+        meta.getPersistentDataContainer().remove(keyManager.getEnhancementKey());
+    }
 }

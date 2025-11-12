@@ -11,15 +11,16 @@ import org.zzq.forgingEnhancement.models.Attribute;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
-public class AttributeApplicationService {
+public class AttributeService {
     private Logger logger;
     private ConfigManager configManager;
     private BaseAttributeManager baseAttributeManager;
     private KeyManager keyManager;
 
-    public AttributeApplicationService(Logger logger, ConfigManager configManager, BaseAttributeManager baseAttributeManager, KeyManager keyManager){
+    public AttributeService(Logger logger, ConfigManager configManager, BaseAttributeManager baseAttributeManager, KeyManager keyManager){
         this.logger = logger;
         this.configManager = configManager;
         this.baseAttributeManager = baseAttributeManager;
@@ -59,7 +60,7 @@ public class AttributeApplicationService {
             switch (attribute.getKey()) {
                 case "attack_damage" -> baseAttrNamespaceKey = NamespacedKey.minecraft("base_attack_damage");
                 case "attack_speed" -> baseAttrNamespaceKey = NamespacedKey.minecraft("base_attack_speed");
-                case "armor" -> {
+                case "armor", "knockback_resistance" -> {
                     if (material.name().equalsIgnoreCase("_helmet")) {
                         baseAttrNamespaceKey = NamespacedKey.minecraft("armor.helmet");
                     }
@@ -73,6 +74,7 @@ public class AttributeApplicationService {
                         baseAttrNamespaceKey = NamespacedKey.minecraft("armor.boots");
                     }
                 }
+                default -> logger.warning("未知的基础属性: " + attribute);
             }
             AttributeModifier baseAttrModifier = new AttributeModifier(
                     baseAttrNamespaceKey,
@@ -111,6 +113,16 @@ public class AttributeApplicationService {
 
         // 添加属性修饰符（不会移除原有的）
         meta.addAttributeModifier(bukkitAttribute, modifier);
+    }
+
+    public void removeForgingAttributes(ItemMeta meta) {
+        if(meta != null && meta.hasAttributeModifiers()){
+            for (Map.Entry<org.bukkit.attribute.Attribute, AttributeModifier> entry : Objects.requireNonNull(meta.getAttributeModifiers()).entries()) {
+                if(entry.getValue().getKey().toString().contains("forgingenhancement")){
+                    meta.removeAttributeModifier(entry.getKey(),entry.getValue());
+                }
+            }
+        }
     }
 
     private org.bukkit.attribute.Attribute getBukkitAttribute(String configKey) {

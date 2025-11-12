@@ -20,7 +20,7 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
 
     private final ForgingEnhancement plugin;
     private final List<String> subCommands = Arrays.asList("reload", "give", "info");
-    private final List<String> qualities = Arrays.asList("common", "uncommon", "epic", "legendary");
+    private final List<String> qualities = Arrays.asList("broken","common", "uncommon", "epic", "legendary","mythic");
 
     public ForgingEnhancementCommand(ForgingEnhancement plugin) {
         this.plugin = plugin;

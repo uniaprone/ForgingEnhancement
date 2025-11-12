@@ -22,16 +22,20 @@ public class StoneManager {
 
     private void initializeQualityMappings() {
         // CustomModelData映射
-        qualityToModelData.put("COMMON", 1001);
-        qualityToModelData.put("UNCOMMON", 1002);
-        qualityToModelData.put("EPIC", 1003);
-        qualityToModelData.put("LEGENDARY", 1004);
+        qualityToModelData.put("BROKEN", 1001);
+        qualityToModelData.put("COMMON", 1002);
+        qualityToModelData.put("UNCOMMON", 1003);
+        qualityToModelData.put("EPIC", 1004);
+        qualityToModelData.put("LEGENDARY", 1005);
+        qualityToModelData.put("MYTHIC", 1006);
 
         // 显示名称映射
+        qualityDisplayNames.put("BROKEN", "破损");
         qualityDisplayNames.put("COMMON", "普通");
         qualityDisplayNames.put("UNCOMMON", "优秀");
         qualityDisplayNames.put("EPIC", "史诗");
         qualityDisplayNames.put("LEGENDARY", "传说");
+        qualityDisplayNames.put("MYTHIC", "神话");
     }
 
     public ItemStack createForgingStone(String quality, int amount) {
@@ -52,8 +56,7 @@ public class StoneManager {
 
         java.util.List<String> lore = new java.util.ArrayList<>();
         lore.add("§7用于在铁砧中强化装备");
-        lore.add("§7品质: " + qualityDisplayNames.get(quality));
-        lore.add("§8ID: " + quality.toLowerCase());
+        lore.add(getQualityColor(quality) + "品质: " + qualityDisplayNames.get(quality));
         meta.setLore(lore);
 
         // 添加NBT标签（服务器逻辑验证）
@@ -67,10 +70,12 @@ public class StoneManager {
     // 获取品质颜色
     public String getQualityColor(String quality) {
         switch (quality) {
+            case "BROKEN": return "§8";
             case "COMMON": return "§f";     // 白色
             case "UNCOMMON": return "§a";   // 绿色
             case "EPIC": return "§5";       // 紫色
             case "LEGENDARY": return "§6";  // 金色
+            case "MYTHIC": return "§d";
             default: return "§f";
         }
     }

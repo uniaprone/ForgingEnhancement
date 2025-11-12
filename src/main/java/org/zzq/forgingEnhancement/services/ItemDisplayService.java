@@ -37,8 +37,12 @@ public class ItemDisplayService {
             if (config != null) {
                 String attrColor = getQualityColor(attr.getLevel());
                 String valueDisplay = formatAttributeValue(config, attr.getValue());
+                if(attr.getValue() > 0){
+                    newLore.add(attrColor + config.name + ": +" + valueDisplay + " 『" + getQualityDisplayName(attr.getLevel()) + "』");
+                }else{
+                    newLore.add(attrColor + config.name + ": " + valueDisplay + " 『" + getQualityDisplayName(attr.getLevel()) + "』");
+                }
 
-                newLore.add(attrColor + config.name + ": +" + valueDisplay + " 『" + getQualityDisplayName(attr.getLevel()) + "』");
             }
         }
 
@@ -89,7 +93,7 @@ public class ItemDisplayService {
 
     private String getQualityDisplayName(String quality) {
         return switch (quality) {
-            case "BROKEN" -> "破旧";
+            case "BROKEN" -> "破损";
             case "COMMON" -> "普通";
             case "UNCOMMON" -> "优秀";
             case "EPIC" -> "史诗";
@@ -101,7 +105,7 @@ public class ItemDisplayService {
 
     private String getQualityDisplayName(int quality) {
         switch (quality) {
-            case 0: return "破旧";
+            case 0: return "破损";
             case 1: return "普通";
             case 2: return "优秀";
             case 3: return "史诗";

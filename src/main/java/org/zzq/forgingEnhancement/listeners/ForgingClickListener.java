@@ -1,7 +1,9 @@
 package org.zzq.forgingEnhancement.listeners;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.AnvilInventory;
@@ -9,25 +11,36 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.services.*;
-import org.zzq.forgingEnhancement.models.EnhancementResult;
+import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUIService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
-public class AnvilClickListener implements Listener {
+public class ForgingClickListener implements Listener {
     private final ForgingService forgingService;
-    public AnvilClickListener(ForgingService forgingService){
+    private final ItemInfoGUIService itemInfoGUIService;
+    public ForgingClickListener(ForgingService forgingService, ItemInfoGUIService itemInfoGUIService){
         this.forgingService = forgingService;
+        this.itemInfoGUIService = itemInfoGUIService;
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         InventoryType inventoryType = event.getInventory().getType();
-        if (inventoryType != InventoryType.ANVIL && inventoryType != InventoryType.WORKBENCH) {
+        ClickType clickType = event.getClick();
+        forgingService.getLogger().info("点击类型: " + clickType);
+        if(!(event.getWhoClicked() instanceof Player)){
             return;
         }
-
+        Player player = (Player) event.getWhoClicked();
+        if(clickType.isRightClick()){
+            if(itemInfoGUIService.isValidInput(player, event.getCurrentItem())){
+                forgingService.getLogger().info("物品名称-1:"+ event.getCurrentItem());
+                itemInfoGUIService.openItemInfoGUI(player, event.getCurrentItem());
+            }
+        }
         if(inventoryType == InventoryType.ANVIL && event.getRawSlot() == 2){
             // 获取铁砧中的物品
             AnvilInventory anvil = (AnvilInventory) event.getInventory();
@@ -47,9 +60,7 @@ public class AnvilClickListener implements Listener {
             event.getWhoClicked().setItemOnCursor(resultForgingItem);
             // 更新铁砧结果槽为空
             anvil.setResult(null);
-        }
-
-        if(inventoryType == InventoryType.WORKBENCH && event.getRawSlot() == 0){
+        }else if(inventoryType == InventoryType.WORKBENCH && event.getRawSlot() == 0){
             CraftingInventory craftingInventory =  (CraftingInventory) event.getInventory();
             ItemStack resultItem = craftingInventory.getResult();
             if(resultItem == null) return;

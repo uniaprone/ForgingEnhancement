@@ -2,9 +2,9 @@ package org.zzq.forgingEnhancement.services;
 
 import org.bukkit.inventory.ItemStack;
 import org.zzq.forgingEnhancement.managers.StoneManager;
+import org.zzq.forgingEnhancement.models.ForgingAttribute;
 import org.zzq.forgingEnhancement.utils.RandomUtil;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
-import org.zzq.forgingEnhancement.models.Attribute;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
 
 import java.math.BigDecimal;
@@ -48,7 +48,7 @@ public class EnhancementService {
         List<String> selectedAttributes = availableAttributes.subList(0, commonAttributeCount);
 
         // 计算选定属性的品质分布
-        List<Attribute> enhancements = calculateAttributeQualities(selectedAttributes, finalItemLevel, commonAttributeCount);
+        List<ForgingAttribute> enhancements = calculateAttributeQualities(selectedAttributes, finalItemLevel, commonAttributeCount);
 
         // 处理稀有属性
         List<String> rareAttributes = configManager.getEquipmentRareAttributes(itemType);
@@ -59,7 +59,7 @@ public class EnhancementService {
                 if (randomValue < 0.1 + (double)(finalItemLevel + 1) / 20.0){
                     logger.info("随机值" + randomValue + "应用稀有属性" + rareAttribute + "等级" + finalItemLevel);
                     // 添加稀有属性，使用最小属性值
-                    enhancements.add(new Attribute(rareAttribute, finalItemLevel,
+                    enhancements.add(new ForgingAttribute(rareAttribute, finalItemLevel,
                             configManager.getAttributeConfig(rareAttribute).values.get(
                                    stoneManager.getLevelQualityMap().get(finalItemLevel)).min));
                 }
@@ -84,8 +84,8 @@ public class EnhancementService {
         }
     }
 
-    private List<Attribute> calculateAttributeQualities(List<String> attributes, int itemQualityLevel, int attributeCount) {
-        List<Attribute> enhancements = new ArrayList<>();
+    private List<ForgingAttribute> calculateAttributeQualities(List<String> attributes, int itemQualityLevel, int attributeCount) {
+        List<ForgingAttribute> enhancements = new ArrayList<>();
 
         // 计算总品质点数（每个词条基础为物品品质等级）
         int totalQualityPoints = itemQualityLevel * attributeCount;
@@ -121,7 +121,7 @@ public class EnhancementService {
                 // 计算属性值
                 double value = calculateAttributeValue(attrConfig, quality);
 
-                enhancements.add(new Attribute(attributeKey, attributeLevels[i], value));
+                enhancements.add(new ForgingAttribute(attributeKey, attributeLevels[i], value));
             }
         }
 

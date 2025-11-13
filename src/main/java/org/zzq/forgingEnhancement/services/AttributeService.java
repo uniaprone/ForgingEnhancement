@@ -7,7 +7,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.managers.BaseAttributeManager;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.managers.KeyManager;
-import org.zzq.forgingEnhancement.models.Attribute;
+import org.zzq.forgingEnhancement.models.ForgingAttribute;
 
 import java.util.List;
 import java.util.Map;
@@ -26,9 +26,9 @@ public class AttributeService {
         this.baseAttributeManager = baseAttributeManager;
         this.keyManager = keyManager;
     }
-    public void applyExtraAttributes(ItemMeta meta, Material material, List<Attribute> attributes) {
-        for (Attribute attribute : attributes) {
-            applySingleAttribute(meta, attribute, material);
+    public void applyExtraAttributes(ItemMeta meta, Material material, List<ForgingAttribute> forgingAttributes) {
+        for (ForgingAttribute forgingAttribute : forgingAttributes) {
+            applySingleAttribute(meta, forgingAttribute, material);
         }
     }
 
@@ -87,26 +87,26 @@ public class AttributeService {
         }
     }
 
-    private void applySingleAttribute(ItemMeta meta, Attribute attribute, Material material) {
-        ConfigManager.AttributeConfig config = configManager.getAttributeConfig(attribute.getName());
+    private void applySingleAttribute(ItemMeta meta, ForgingAttribute forgingAttribute, Material material) {
+        ConfigManager.AttributeConfig config = configManager.getAttributeConfig(forgingAttribute.getName());
         if (config == null) {
-            logger.warning("未知的属性配置: " + attribute.getName());
+            logger.warning("未知的属性配置: " + forgingAttribute.getName());
             return;
         }
 
-        org.bukkit.attribute.Attribute bukkitAttribute = getBukkitAttribute(attribute.getName());
+        org.bukkit.attribute.Attribute bukkitAttribute = getBukkitAttribute(forgingAttribute.getName());
         if (bukkitAttribute == null) {
-            logger.warning("未知的Bukkit属性: " + attribute.getName());
+            logger.warning("未知的Bukkit属性: " + forgingAttribute.getName());
             return;
         }
 
         // 创建唯一标识符
-        NamespacedKey modifierKey = keyManager.createUniqueKey(attribute.getName());
+        NamespacedKey modifierKey = keyManager.createUniqueKey(forgingAttribute.getName());
 
         // 创建属性修饰符，使用原物品对应的槽位
         AttributeModifier modifier = new AttributeModifier(
                 modifierKey,
-                attribute.getValue(),
+                forgingAttribute.getValue(),
                 AttributeModifier.Operation.valueOf(config.operation),
                 material.getEquipmentSlot().getGroup()
         );

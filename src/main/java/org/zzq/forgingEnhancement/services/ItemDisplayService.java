@@ -1,13 +1,15 @@
 package org.zzq.forgingEnhancement.services;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
-import org.zzq.forgingEnhancement.models.Attribute;
+import org.zzq.forgingEnhancement.models.EnhancementResult;
+import org.zzq.forgingEnhancement.models.ForgingAttribute;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ItemDisplayService {
     private ConfigManager configManager;
@@ -17,7 +19,7 @@ public class ItemDisplayService {
         this.regxService = regxService;
     }
 
-    public void updateItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel, List<Attribute> enhancements) {
+    public void updateItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel, List<ForgingAttribute> enhancements) {
         // 获取原有Lore
         List<String> originalLore = originalMeta.hasLore() ? originalMeta.getLore() : new ArrayList<>();
         if (originalLore == null) originalLore = new ArrayList<>();
@@ -32,7 +34,7 @@ public class ItemDisplayService {
         newLore.add(qualityColor + "品质: " + "『" + getQualityDisplayName(itemQualityLevel) + "』");
 
         // 添加词条信息
-        for (Attribute attr : enhancements) {
+        for (ForgingAttribute attr : enhancements) {
             ConfigManager.AttributeConfig config = configManager.getAttributeConfig(attr.getName());
             if (config != null) {
                 String attrColor = getQualityColor(attr.getLevel());
@@ -47,6 +49,22 @@ public class ItemDisplayService {
         }
         newLore.addAll(originalLore);
         newMeta.setLore(newLore);
+    }
+
+    public void guiItemDisplay(ItemMeta itemMeta, ForgingAttribute forgingAttribute) {
+        List<String> newLore = new ArrayList<>();
+        ConfigManager.AttributeConfig config = configManager.getAttributeConfig(forgingAttribute.getName());
+        if (config != null) {
+            String attrColor = getQualityColor(forgingAttribute.getLevel());
+            String valueDisplay = formatAttributeValue(config, forgingAttribute.getValue());
+            itemMeta.displayName(Component.text(attrColor + "属性：" + config.name));
+            if(forgingAttribute.getValue() > 0){
+                newLore.add(attrColor + "+" + valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』");
+            }else{
+                newLore.add(attrColor + valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』");
+            }
+        }
+        itemMeta.setLore(newLore);
     }
 
     public void updatePrepareAnvilDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel){

@@ -4,15 +4,15 @@ import java.util.List;
 
 public class EnhancementResult {
     private int level;
-    List<Attribute> attributeList;
+    List<ForgingAttribute> forgingAttributeList;
 
-    public EnhancementResult(int level, List<Attribute> attributeList) {
+    public EnhancementResult(int level, List<ForgingAttribute> forgingAttributeList) {
         this.level = level;
-        this.attributeList = attributeList;
+        this.forgingAttributeList = forgingAttributeList;
     }
 
-    public List<Attribute> getAttributeList() {
-        return attributeList;
+    public List<ForgingAttribute> getAttributeList() {
+        return forgingAttributeList;
     }
 
     public int getLevel() {

@@ -57,7 +57,7 @@ public class ForgingService {
         //4.添加锻造属性
         attributeService.applyExtraAttributes(resultItemMeta, resultItem.getType(), enhancementResult.getAttributeList());
         //5.存储锻造数据
-        nbtService.storeForgingNBT(resultItemMeta, keyManager.getEnhancementKey(), enhancementResult);
+        nbtService.storeForgingNBT(resultItemMeta, enhancementResult);
         //6.更新显示
         itemDisplayService.updateItemDisplay(resultItemMeta, resultItem.getItemMeta(), enhancementResult.getLevel(), enhancementResult.getAttributeList());
         //7.应用强化

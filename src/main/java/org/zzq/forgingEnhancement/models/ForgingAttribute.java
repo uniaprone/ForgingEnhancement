@@ -1,11 +1,11 @@
 package org.zzq.forgingEnhancement.models;
 
-public class Attribute {
+public class ForgingAttribute {
     private String name;
     private int level;
     private double value;
 
-    public Attribute(String name, int level, double value) {
+    public ForgingAttribute(String name, int level, double value) {
         this.name = name;
         this.level = level;
         this.value = value;

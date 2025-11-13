@@ -10,13 +10,13 @@ import org.zzq.forgingEnhancement.models.EnhancementResult;
 public class NBTService {
 
     private final Gson gson = new Gson();
-    private KeyManager keyManager;
+    private final KeyManager keyManager;
     public NBTService(KeyManager keyManager){
         this.keyManager = keyManager;
     }
-    public void storeForgingNBT(ItemMeta itemMeta, NamespacedKey namespacedKey, EnhancementResult enhancementResult) {
+    public void storeForgingNBT(ItemMeta itemMeta, EnhancementResult enhancementResult) {
         String AttributesString = gson.toJson(enhancementResult);
-        itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, AttributesString);
+        itemMeta.getPersistentDataContainer().set(keyManager.getEnhancementKey(),  PersistentDataType.STRING, AttributesString);
     }
     public void markBaseAttributeApplied(ItemMeta meta) {
         meta.getPersistentDataContainer().set(keyManager.getBaseAttributeKey(), PersistentDataType.BYTE, (byte) 1);
@@ -26,6 +26,9 @@ public class NBTService {
     }
     public boolean hasForgingNBT(ItemMeta meta){
         return meta.getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING) != null;
+    }
+    public String getForgingStringNBT(ItemMeta meta){
+        return meta.getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING);
     }
     public EnhancementResult getForgingNBT(ItemMeta meta){
         String AttributesString = meta.getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING);

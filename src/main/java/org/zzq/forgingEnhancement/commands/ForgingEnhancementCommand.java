@@ -110,7 +110,9 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
 
             case 3:
                 // 第三个参数：品质补全
-                return StringUtil.copyPartialMatches(args[2], qualities, new ArrayList<>());
+                List<String> extendedQualities = new ArrayList<>(qualities);
+                extendedQualities.add("engravestone"); // 添加新字符串
+                return StringUtil.copyPartialMatches(args[2], extendedQualities, new ArrayList<>());
 
             case 4:
                 // 第四个参数：数量补全（提供一些常用数值）
@@ -129,7 +131,7 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
         }
 
         String playerName = args[1];
-        String quality = args[2].toUpperCase();
+
         int amount;
 
         try {
@@ -148,22 +150,32 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
             sender.sendMessage(ChatColor.RED + "玩家 " + playerName + " 不存在或不在线!");
             return;
         }
-
+        String quality = args[2].toUpperCase();
         // 验证品质是否有效
-        if (!plugin.getStoneManager().getQualityDisplayNames().containsKey(quality)) {
+        if (plugin.getStoneManager().getQualityDisplayNames().containsKey(quality)) {
+
+            // 创建锻造石并给予玩家
+            ItemStack forgingStone = plugin.getStoneManager().createForgingStone(quality, amount);
+            target.getInventory().addItem(forgingStone);
+
+            String displayName = plugin.getStoneManager().getQualityDisplayNames().get(quality);
+            sender.sendMessage(ChatColor.GREEN + "已给予 " + target.getName() + " " + amount + " 个" + displayName + "锻造石");
+            if (!sender.equals(target)) {
+                target.sendMessage(ChatColor.GREEN + "你获得了 " + amount + " 个" + displayName + "锻造石");
+            }
+        } else if (quality.equalsIgnoreCase("engravestone")) {
+            // 创建锻造石并给予玩家
+            ItemStack engraveStone = plugin.getEngraveStoneManager().createBindingStone(amount);
+            target.getInventory().addItem(engraveStone);
+
+            sender.sendMessage(ChatColor.GREEN + "已给予 " + target.getName() + " " + amount + " 个" + "铭刻石");
+            if (!sender.equals(target)) {
+                target.sendMessage(ChatColor.GREEN + "你获得了 " + amount + " 个" + "铭刻石");
+            }
+        }else{
             sender.sendMessage(ChatColor.RED + "无效的品质! 可用品质: common, uncommon, epic, legendary");
-            return;
         }
 
-        // 创建锻造石并给予玩家
-        ItemStack forgingStone = plugin.getStoneManager().createForgingStone(quality, amount);
-        target.getInventory().addItem(forgingStone);
-
-        String displayName = plugin.getStoneManager().getQualityDisplayNames().get(quality);
-        sender.sendMessage(ChatColor.GREEN + "已给予 " + target.getName() + " " + amount + " 个" + displayName + "锻造石");
-        if (!sender.equals(target)) {
-            target.sendMessage(ChatColor.GREEN + "你获得了 " + amount + " 个" + displayName + "锻造石");
-        }
     }
 
     private void sendHelp(CommandSender sender) {

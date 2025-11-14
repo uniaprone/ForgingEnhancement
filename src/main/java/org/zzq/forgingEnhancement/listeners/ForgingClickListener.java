@@ -11,12 +11,11 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.services.*;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUIService;
+import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 public class ForgingClickListener implements Listener {
     private final ForgingService forgingService;

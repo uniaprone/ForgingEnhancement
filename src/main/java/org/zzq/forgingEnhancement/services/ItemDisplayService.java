@@ -2,6 +2,8 @@ package org.zzq.forgingEnhancement.services;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.entity.Item;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
@@ -63,8 +65,28 @@ public class ItemDisplayService {
             }else{
                 newLore.add(attrColor + valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』");
             }
+            if(forgingAttribute.isEngraved()){
+                newLore.add("§7已铭刻");
+            }
         }
         itemMeta.setLore(newLore);
+    }
+
+    public void addEngravedLora(ItemMeta itemMeta){
+        List<Component> originLore = itemMeta.lore();
+        if (originLore != null) {
+            originLore.add(originLore.size() ,Component.text("§7已铭刻"));
+        }else{
+            originLore = List.of(Component.text("§7已铭刻"));
+        }
+        itemMeta.lore(originLore);
+//        List<String> originLore = itemMeta.getLore();
+//        if (originLore != null) {
+//            originLore.add(originLore.size() - 1 ,"§7已铭刻");
+//        }else{
+//            originLore = List.of("§7已铭刻");
+//        }
+//        itemMeta.setLore(originLore);
     }
 
     public void updatePrepareAnvilDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel){
@@ -147,6 +169,47 @@ public class ItemDisplayService {
             case 4: return "传说";
             case 5: return "神话";
             default: return "普通";
+        }
+    }
+
+    public void setCustomName(ItemStack itemStack, Component component) {
+        if (itemStack == null) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return;
+        itemMeta.customName(component);
+        itemStack.setItemMeta(itemMeta); // 必须保存修改
+    }
+
+    public void setLore(ItemStack itemStack, String lore){
+        if(itemStack == null) return;
+        if(!itemStack.hasItemMeta()) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        List<Component> loreList = new ArrayList<>();
+        loreList.add(Component.text(lore));
+        itemMeta.lore(loreList);
+        itemStack.setItemMeta(itemMeta);
+    }
+
+    public void addLore(ItemStack itemStack, List<String> lorelist){
+        if(itemStack == null) return;
+        if(!itemStack.hasItemMeta()) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if(itemMeta.hasLore()){
+            List<Component> loreList = itemMeta.lore();
+            for(String lore : lorelist){
+                if (loreList != null) {
+                    loreList.add(Component.text(lore));
+                }
+            }
+            itemMeta.lore(loreList);
+            itemStack.setItemMeta(itemMeta);
+        }else{
+            List<Component> loreList = new ArrayList<>();
+            for(String lore : lorelist){
+                loreList.add(Component.text(lore));
+            }
+            itemMeta.lore(loreList);
+            itemStack.setItemMeta(itemMeta);
         }
     }
 }

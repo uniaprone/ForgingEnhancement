@@ -1,14 +1,19 @@
 package org.zzq.forgingEnhancement.services.guiService;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.util.RGBLike;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.zzq.forgingEnhancement.models.EnhancementResult;
+import org.w3c.dom.css.RGBColor;
 import org.zzq.forgingEnhancement.models.ForgingAttribute;
 import org.zzq.forgingEnhancement.services.ItemDisplayService;
+import org.zzq.forgingEnhancement.services.NBTService;
+import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingHolder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +22,7 @@ import java.util.logging.Logger;
 public class GUIDecorateService {
     private Logger logger;
     private ItemDisplayService itemDisplayService;
+    private NBTService nbtService;
     private List<ItemStack> decorateItemList = List.of(
          new ItemStack(Material.GRAY_STAINED_GLASS_PANE),
          new ItemStack(Material.WHITE_STAINED_GLASS_PANE),
@@ -31,9 +37,10 @@ public class GUIDecorateService {
     private int[] rightBroadSolts = new int[]{
             5,6,7,8,17,26,35,44,53,52,51,50
     };
-    public GUIDecorateService(Logger logger, ItemDisplayService itemDisplayService){
+    public GUIDecorateService(Logger logger, ItemDisplayService itemDisplayService, NBTService nbtService){
         this.logger = logger;
         this.itemDisplayService = itemDisplayService;
+        this.nbtService = nbtService;
     }
 
     public Map<Integer, ItemStack> placeForgingItem(ItemStack itemStack){
@@ -60,6 +67,7 @@ public class GUIDecorateService {
         for (int i = 0; i < forgingAttributes.size(); i++) {
             ItemStack paper =  new ItemStack(Material.NETHER_STAR);
             ItemMeta itemMeta = paper.getItemMeta();
+            nbtService.storeForgingAttributeGUINBT(itemMeta, forgingAttributes.get(i));
             itemDisplayService.guiItemDisplay(itemMeta, forgingAttributes.get(i));
             paper.setItemMeta(itemMeta);
             attributeSlots.put(slot, paper);
@@ -73,6 +81,45 @@ public class GUIDecorateService {
             }
         }
         return attributeSlots;
+    }
+
+    public Map<Integer, ItemStack> attributeBindingSlots(AttributeBindingHolder holder, ItemStack attributeItem,int level){
+        Map<Integer, ItemStack> map = new HashMap<>();
+        for(int i = 0; i < 9; i++){
+            if(holder.getSlotType(i).equals(AttributeBindingHolder.SlotType.DISPLAY_ONLY)){
+                if(i == 1){
+                    map.put(1, attributeItem);
+                    continue;
+                }
+                map.put(i, new ItemStack(decorateItemList.get(level)));
+            } else if (holder.getSlotType(i).equals(AttributeBindingHolder.SlotType.FUNCTIONAL)) {
+                if(i == 6) {
+                    ItemStack itemStack = new ItemStack(Material.LIME_WOOL);
+                    Component nameComponent = Component.text("确认")
+                                    .color(NamedTextColor.GREEN)
+                                    .decorate(TextDecoration.BOLD);
+                    itemDisplayService.setCustomName(itemStack, nameComponent);
+                    map.put(6, itemStack);
+                }
+                if(i == 7) {
+                    ItemStack itemStack = new ItemStack(Material.RED_WOOL);
+                    Component nameComponent = Component.text("取消")
+                            .color(NamedTextColor.RED)
+                            .decorate(TextDecoration.BOLD);
+                    itemDisplayService.setCustomName(itemStack, nameComponent);
+                    map.put(7, itemStack);
+                }
+                if(i == 8) {
+                    ItemStack itemStack = new ItemStack(Material.BARRIER);
+                    Component nameComponent = Component.text("返回")
+                            .color(NamedTextColor.DARK_AQUA)
+                            .decorate(TextDecoration.BOLD);
+                    itemDisplayService.setCustomName(itemStack, nameComponent);
+                    map.put(8, itemStack);
+                }
+            }
+        }
+        return map;
     }
 
 }

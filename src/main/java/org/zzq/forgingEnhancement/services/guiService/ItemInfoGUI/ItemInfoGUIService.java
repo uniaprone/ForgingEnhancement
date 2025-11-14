@@ -1,21 +1,17 @@
-package org.zzq.forgingEnhancement.services.guiService;
+package org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI;
 
-import com.google.common.collect.Multimap;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
-import org.zzq.forgingEnhancement.services.EnhancementService;
 import org.zzq.forgingEnhancement.services.NBTService;
+import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -23,6 +19,7 @@ public class ItemInfoGUIService {
     private Logger logger;
     private NBTService nbtService;
     private GUIDecorateService guiDecorateService;
+    private ItemInfoGUIHolder inventoryHolder;
     public ItemInfoGUIService(Logger logger, NBTService nbtService, GUIDecorateService guiDecorateService) {
         this.logger = logger;
         this.nbtService = nbtService;
@@ -31,19 +28,20 @@ public class ItemInfoGUIService {
 
     public void openItemInfoGUI(Player player, ItemStack item){
         ItemMeta itemMeta = item.getItemMeta();
-        logger.info("forgingAttribute为:"+ item);
-        InventoryHolder inventoryHolder = new ItemInfoGUIHolder(item);
-        Component titleComponent = getDisplayName(item);
-        Inventory itemInfoInventory = Bukkit.createInventory(inventoryHolder, 54, titleComponent);
-        Map<Integer, ItemStack> forgingItem = guiDecorateService.placeForgingItem(item.clone());
+        Map<Integer, ItemStack> slotMap = new HashMap<>();
+        Map<Integer, ItemStack> forgingItem = guiDecorateService.placeForgingItem(item);
+        slotMap.putAll(forgingItem);
         if(nbtService.hasForgingNBT(itemMeta)){
             EnhancementResult enhancementResult = nbtService.getForgingNBT(itemMeta);
             Map<Integer, ItemStack> border = guiDecorateService.itemInfoGUIBorder(enhancementResult.getLevel());
+            slotMap.putAll(border);
             Map<Integer, ItemStack> forgingAttributeSlots = guiDecorateService.forgingAttributeSlots(enhancementResult.getAttributeList());
-            border.forEach(itemInfoInventory::setItem);
-            forgingAttributeSlots.forEach(itemInfoInventory::setItem);
+            slotMap.putAll(forgingAttributeSlots);
         }
-        forgingItem.forEach(itemInfoInventory::setItem);
+        inventoryHolder = new ItemInfoGUIHolder(item, slotMap);
+        Component titleComponent = getDisplayName(item);
+        Inventory itemInfoInventory = Bukkit.createInventory(inventoryHolder, 54, titleComponent);
+        inventoryHolder.getSlotMap().forEach(itemInfoInventory::setItem);
         player.openInventory(itemInfoInventory);
     }
 
@@ -59,5 +57,9 @@ public class ItemInfoGUIService {
         else{
             return Component.text("装备属性");
         }
+    }
+
+    public ItemInfoGUIHolder getInventoryHolder() {
+        return inventoryHolder;
     }
 }

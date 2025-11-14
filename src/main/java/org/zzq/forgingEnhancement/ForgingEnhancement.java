@@ -3,16 +3,15 @@ package org.zzq.forgingEnhancement;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.zzq.forgingEnhancement.commands.ForgingEnhancementCommand;
-import org.zzq.forgingEnhancement.listeners.ForgingClickListener;
-import org.zzq.forgingEnhancement.listeners.AnvilForgingListener;
-import org.zzq.forgingEnhancement.listeners.CraftingForgingListener;
-import org.zzq.forgingEnhancement.listeners.ItemInfoGUIListener;
+import org.zzq.forgingEnhancement.listeners.*;
+import org.zzq.forgingEnhancement.managers.EngraveStoneManager;
 import org.zzq.forgingEnhancement.managers.FileManager;
 import org.zzq.forgingEnhancement.managers.KeyManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
 import org.zzq.forgingEnhancement.services.*;
 import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUIService;
+import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
+import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingService;
 
 public class ForgingEnhancement extends JavaPlugin implements Listener {
 
@@ -23,6 +22,8 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     private NBTService nbtService;
     private ItemDisplayService itemDisplayService;
     private ItemInfoGUIService itemInfoGUIService;
+    private AttributeBindingService attributeBindingService;
+    private EngraveStoneManager engraveStoneManager;
 
     @Override
     public void onEnable() {
@@ -43,13 +44,14 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     }
     private void initializeService(){
         RegxService regxService = new RegxService(this.getLogger());
+        engraveStoneManager = new EngraveStoneManager(keyManager);
         itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService);
-        GUIDecorateService guiDecorateService = new GUIDecorateService(this.getLogger(), itemDisplayService);
         nbtService = new NBTService(keyManager);
+        GUIDecorateService guiDecorateService = new GUIDecorateService(this.getLogger(), itemDisplayService, nbtService);
         itemInfoGUIService =  new ItemInfoGUIService(this.getLogger(), nbtService, guiDecorateService);
         AttributeService attributeService = new AttributeService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
         EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager(), stoneManager,this.getLogger());
-
+        attributeBindingService = new AttributeBindingService(this.getLogger(), nbtService, guiDecorateService, engraveStoneManager, itemDisplayService);
         this.forgingService = new ForgingService(
                 attributeService,
                 enhancementService,
@@ -68,7 +70,8 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new CraftingForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService,this.getLogger()), this);
         getServer().getPluginManager().registerEvents(new AnvilForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService), this);
         getServer().getPluginManager().registerEvents(new ForgingClickListener(forgingService, itemInfoGUIService), this);
-        getServer().getPluginManager().registerEvents(new ItemInfoGUIListener(this.getLogger(), itemInfoGUIService), this);
+        getServer().getPluginManager().registerEvents(new ItemInfoGUIListener(this.getLogger(), itemInfoGUIService, attributeBindingService), this);
+        getServer().getPluginManager().registerEvents(new AttributeBindingGUIListener(this.getLogger(), attributeBindingService, itemInfoGUIService), this);
     }
 
     @Override
@@ -82,5 +85,9 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     public StoneManager getStoneManager() {
         return stoneManager;
+    }
+
+    public EngraveStoneManager getEngraveStoneManager() {
+        return engraveStoneManager;
     }
 }

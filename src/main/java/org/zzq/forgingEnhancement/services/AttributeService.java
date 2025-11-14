@@ -2,13 +2,16 @@ package org.zzq.forgingEnhancement.services;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.managers.BaseAttributeManager;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.managers.KeyManager;
+import org.zzq.forgingEnhancement.models.EnhancementResult;
 import org.zzq.forgingEnhancement.models.ForgingAttribute;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,6 +33,25 @@ public class AttributeService {
         for (ForgingAttribute forgingAttribute : forgingAttributes) {
             applySingleAttribute(meta, forgingAttribute, material);
         }
+    }
+
+    public EnhancementResult removeHasEngravedResult(EnhancementResult enhancementResult, List<ForgingAttribute> engravedForgingAttributes) {
+        List<ForgingAttribute> forgingAttributes = enhancementResult.getAttributeList();
+        Iterator<ForgingAttribute> iterator = forgingAttributes.iterator();
+        while (iterator.hasNext()){
+            ForgingAttribute forgingAttribute = iterator.next();
+            for(ForgingAttribute engravedForgingAttribute : engravedForgingAttributes){
+                if(forgingAttribute.getName().equals(engravedForgingAttribute.getName())){
+                    iterator.remove();
+                }
+            }
+        }
+        return enhancementResult;
+    }
+
+    public void addEngravedResult(EnhancementResult enhancementResult, List<ForgingAttribute> engravedForgingAttributes) {
+        List<ForgingAttribute> forgingAttributes = enhancementResult.getAttributeList();
+        forgingAttributes.addAll(0, engravedForgingAttributes);
     }
 
     public void applyBaseAttributes(ItemMeta meta, Material material) {
@@ -117,13 +139,29 @@ public class AttributeService {
 
     public void removeForgingAttributes(ItemMeta meta) {
         if(meta != null && meta.hasAttributeModifiers()){
-            for (Map.Entry<org.bukkit.attribute.Attribute, AttributeModifier> entry : Objects.requireNonNull(meta.getAttributeModifiers()).entries()) {
+            for (Map.Entry<Attribute, AttributeModifier> entry : Objects.requireNonNull(meta.getAttributeModifiers()).entries()) {
                 if(entry.getValue().getKey().toString().contains("forgingenhancement")){
                     meta.removeAttributeModifier(entry.getKey(),entry.getValue());
                 }
             }
         }
     }
+
+//    public void removeForgingAttributesExpectEngraved(ItemMeta meta, List<ForgingAttribute> engravedForgingAttributes) {
+//        if(meta != null && meta.hasAttributeModifiers()){
+//            for (Map.Entry<Attribute, AttributeModifier> entry : Objects.requireNonNull(meta.getAttributeModifiers()).entries()) {
+//                for(ForgingAttribute engravedForgingAttribute : engravedForgingAttributes){
+//                    String attributeName = entry.getValue().getKey().toString();
+//                    logger.info("循环属性名： " + attributeName);
+//                    logger.info("铭刻属性名： " + engravedForgingAttribute.getName());
+//                    if(attributeName.contains("forgingenhancement") && !attributeName.contains(engravedForgingAttribute.getName())){
+//                        logger.info("移除属性名： " + attributeName);
+//                        meta.removeAttributeModifier(entry.getKey(),entry.getValue());
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private org.bukkit.attribute.Attribute getBukkitAttribute(String configKey) {
         switch (configKey) {

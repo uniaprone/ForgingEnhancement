@@ -7,7 +7,9 @@ import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.managers.KeyManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
+import org.zzq.forgingEnhancement.models.ForgingAttribute;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 public class ForgingService {
@@ -20,6 +22,7 @@ public class ForgingService {
     private StoneManager stoneManager;
     private KeyManager keyManager;
     private Logger logger;
+    private List<ForgingAttribute> engravedAttributes;
     public ForgingService(AttributeService attributeService,
                           EnhancementService enhancementService,
                           ItemDisplayService itemDisplayService,
@@ -44,7 +47,7 @@ public class ForgingService {
         int baseLevel = stoneManager.getStoneQualityLevel(forgingStone);
         //1.判断是否是重铸
         if(nbtService.hasForgingNBT(resultItemMeta)){
-            nbtService.removeForgingNBT(resultItemMeta);
+            engravedAttributes = nbtService.removeForgingNBTReturnEngraved(resultItemMeta);
             attributeService.removeForgingAttributes(resultItemMeta);
         }
         //2.强化
@@ -53,6 +56,12 @@ public class ForgingService {
         if (!nbtService.hasBaseAttributeApplied(resultItemMeta)) {
             attributeService.applyBaseAttributes(resultItemMeta, resultItem.getType());
             nbtService.markBaseAttributeApplied(resultItemMeta);
+        }
+        if(engravedAttributes != null && !engravedAttributes.isEmpty()){
+            //3.3 移除新增铭刻属性
+            attributeService.removeHasEngravedResult(enhancementResult, engravedAttributes);
+            //3.6 添加铭刻属性
+            attributeService.addEngravedResult(enhancementResult, engravedAttributes);
         }
         //4.添加锻造属性
         attributeService.applyExtraAttributes(resultItemMeta, resultItem.getType(), enhancementResult.getAttributeList());

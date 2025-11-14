@@ -45,7 +45,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     private void initializeService(){
         RegxService regxService = new RegxService(this.getLogger());
         engraveStoneManager = new EngraveStoneManager(keyManager);
-        itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService);
+        itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService, this.getLogger());
         nbtService = new NBTService(keyManager);
         GUIDecorateService guiDecorateService = new GUIDecorateService(this.getLogger(), itemDisplayService, nbtService);
         itemInfoGUIService =  new ItemInfoGUIService(this.getLogger(), nbtService, guiDecorateService);

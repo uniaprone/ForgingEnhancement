@@ -8,6 +8,9 @@ import org.zzq.forgingEnhancement.managers.KeyManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
 import org.zzq.forgingEnhancement.models.ForgingAttribute;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NBTService {
 
     private final Gson gson = new Gson();
@@ -53,5 +56,18 @@ public class NBTService {
     }
     public void removeForgingNBT(ItemMeta meta){
         meta.getPersistentDataContainer().remove(keyManager.getEnhancementKey());
+    }
+
+    public List<ForgingAttribute> removeForgingNBTReturnEngraved(ItemMeta meta){
+        List<ForgingAttribute> forgingAttributes = new ArrayList<>();
+        String enhanceResultString = meta.getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING);
+        EnhancementResult enhancementResult = gson.fromJson(enhanceResultString, EnhancementResult.class);
+        for(ForgingAttribute forgingAttribute: enhancementResult.getAttributeList()){
+            if(forgingAttribute.isEngraved()){
+                forgingAttributes.add(forgingAttribute);
+            }
+        }
+        meta.getPersistentDataContainer().remove(keyManager.getEnhancementKey());
+        return forgingAttributes;
     }
 }

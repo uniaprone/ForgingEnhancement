@@ -2,9 +2,13 @@ package org.zzq.forgingEnhancement.services;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.slf4j.ILoggerFactory;
+
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
 import org.zzq.forgingEnhancement.models.ForgingAttribute;
@@ -12,72 +16,80 @@ import org.zzq.forgingEnhancement.models.ForgingAttribute;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class ItemDisplayService {
     private ConfigManager configManager;
     private RegxService regxService;
-    public ItemDisplayService(ConfigManager configManager, RegxService regxService){
+    private Logger logger;
+    public ItemDisplayService(ConfigManager configManager, RegxService regxService, Logger logger){
         this.configManager = configManager;
         this.regxService = regxService;
+        this.logger = logger;
     }
 
     public void updateItemDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel, List<ForgingAttribute> enhancements) {
         // 获取原有Lore
-        List<String> originalLore = originalMeta.hasLore() ? originalMeta.getLore() : new ArrayList<>();
+        List<Component> originalLore = originalMeta.hasLore() ? originalMeta.lore() : new ArrayList<>();
         if (originalLore == null) originalLore = new ArrayList<>();
 
         // 移除之前由本插件添加的强化信息（如果有的话）
         removeOldForgingLore(originalLore);
 
-        List<String> newLore = new ArrayList<>();
+        List<Component> newLore = new ArrayList<>();
 
         // 添加品质信息
-        String qualityColor = getQualityColor(itemQualityLevel);
-        newLore.add(qualityColor + "品质: " + "『" + getQualityDisplayName(itemQualityLevel) + "』");
+        NamedTextColor qualityColor = getQualityColor(itemQualityLevel);
+        Component component = Component.text("品质: " + "『" + getQualityDisplayName(itemQualityLevel) + "』").color(qualityColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE);
+        newLore.add(component);
 
         // 添加词条信息
         for (ForgingAttribute attr : enhancements) {
             ConfigManager.AttributeConfig config = configManager.getAttributeConfig(attr.getName());
             if (config != null) {
-                String attrColor = getQualityColor(attr.getLevel());
+                NamedTextColor attrColor = getQualityColor(attr.getLevel());
                 String valueDisplay = formatAttributeValue(config, attr.getValue());
                 if(attr.getValue() > 0){
-                    newLore.add(attrColor + config.name + ": +" + valueDisplay + " 『" + getQualityDisplayName(attr.getLevel()) + "』");
+                    Component attrComponent = Component.text( config.name + ": +" + valueDisplay + " 『" + getQualityDisplayName(attr.getLevel()) + "』").color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE);
+                    newLore.add(attrComponent);
                 }else{
-                    newLore.add(attrColor + config.name + ": " + valueDisplay + " 『" + getQualityDisplayName(attr.getLevel()) + "』");
+                    Component attrComponent = Component.text(config.name + ": " + valueDisplay + " 『" + getQualityDisplayName(attr.getLevel()) + "』").color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE);
+                    newLore.add(attrComponent);
                 }
-
             }
         }
         newLore.addAll(originalLore);
-        newMeta.setLore(newLore);
+        newMeta.lore(newLore);
     }
 
     public void guiItemDisplay(ItemMeta itemMeta, ForgingAttribute forgingAttribute) {
-        List<String> newLore = new ArrayList<>();
+        List<Component> newLore = new ArrayList<>();
         ConfigManager.AttributeConfig config = configManager.getAttributeConfig(forgingAttribute.getName());
         if (config != null) {
-            String attrColor = getQualityColor(forgingAttribute.getLevel());
+            NamedTextColor attrColor = getQualityColor(forgingAttribute.getLevel());
             String valueDisplay = formatAttributeValue(config, forgingAttribute.getValue());
-            itemMeta.displayName(Component.text(attrColor + "属性：" + config.name));
+            itemMeta.displayName(Component.text("属性：" + config.name).color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE));
             if(forgingAttribute.getValue() > 0){
-                newLore.add(attrColor + "+" + valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』");
+                Component attributeComponent = Component.text("+" + valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』").color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE);
+                newLore.add(attributeComponent);
             }else{
-                newLore.add(attrColor + valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』");
+                Component attributeComponent = Component.text(valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』").color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE);
+                newLore.add(attributeComponent);
             }
             if(forgingAttribute.isEngraved()){
-                newLore.add("§7已铭刻");
+                Component engravedLore = Component.text("已铭刻").color(NamedTextColor.DARK_GRAY);
+                newLore.add(engravedLore);
             }
         }
-        itemMeta.setLore(newLore);
+        itemMeta.lore(newLore);
     }
 
     public void addEngravedLora(ItemMeta itemMeta){
         List<Component> originLore = itemMeta.lore();
         if (originLore != null) {
-            originLore.add(originLore.size() ,Component.text("§7已铭刻"));
+            originLore.add(originLore.size() ,Component.text("已铭刻").color(NamedTextColor.DARK_GRAY));
         }else{
-            originLore = List.of(Component.text("§7已铭刻"));
+            originLore = List.of(Component.text("已铭刻").color(NamedTextColor.DARK_GRAY));
         }
         itemMeta.lore(originLore);
 //        List<String> originLore = itemMeta.getLore();
@@ -91,26 +103,29 @@ public class ItemDisplayService {
 
     public void updatePrepareAnvilDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel){
         // 获取原有Lore
-        List<String> originalLore = originalMeta.hasLore() ? originalMeta.getLore() : new ArrayList<>();
+        List<Component> originalLore = originalMeta.hasLore() ? originalMeta.lore() : new ArrayList<>();
         if (originalLore == null) originalLore = new ArrayList<>();
-
         // 移除之前由本插件添加的强化信息（如果有的话）
+        logger.info("初始meta " + newMeta);
+        logger.info("初始mlore " + originalLore);
         removeOldForgingLore(originalLore);
 
-        List<String> newLore = new ArrayList<>();
+        List<Component> newLore = new ArrayList<>();
 
         // 添加品质信息
-        String qualityColor = getQualityColor(itemQualityLevel);
-        newLore.add(qualityColor + "品质: " + "???");
+        NamedTextColor qualityColor = getQualityColor(itemQualityLevel);
+        Component unKnowComponent = Component.text("品质: " + "???").color(qualityColor);
+        newLore.add(unKnowComponent);
         newLore.addAll(originalLore);
-        newMeta.setLore(newLore);
+        newMeta.lore(newLore);
     }
 
-    private void removeOldForgingLore(List<String> Lore){
-        Iterator<String> iterator = Lore.iterator();
+    private void removeOldForgingLore(List<Component> Lore){
+        Iterator<Component> iterator = Lore.iterator();
         while (iterator.hasNext()) {
-            String line = iterator.next();
-            if(regxService.loraDetection(line)){
+            TextComponent line = (TextComponent) iterator.next();
+            logger.info("组件文本" + line.content());
+            if(regxService.loraDetection(line.content())){
                 iterator.remove();
             }
         }
@@ -136,15 +151,27 @@ public class ItemDisplayService {
         };
     }
 
-    private String getQualityColor(int quality) {
+//    private String getQualityColor(int quality) {
+//        return switch (quality) {
+//            case 0 -> "§8";    // 深灰
+//            case 1 -> "§f";   // 白色
+//            case 2 -> "§a"; // 绿色
+//            case 3 -> "§5";      // 紫色
+//            case 4 -> "§6"; // 金色
+//            case 5 -> "§d";    // 粉色
+//            default -> "§f";
+//        };
+//    }
+
+    private NamedTextColor getQualityColor(int quality) {
         return switch (quality) {
-            case 0 -> "§8";    // 深灰
-            case 1 -> "§f";   // 白色
-            case 2 -> "§a"; // 绿色
-            case 3 -> "§5";      // 紫色
-            case 4 -> "§6"; // 金色
-            case 5 -> "§d";    // 粉色
-            default -> "§f";
+            case 0 -> NamedTextColor.DARK_GRAY;    // 深灰
+            case 1 -> NamedTextColor.WHITE;   // 白色
+            case 2 -> NamedTextColor.GREEN; // 绿色
+            case 3 -> NamedTextColor.DARK_PURPLE;      // 紫色
+            case 4 -> NamedTextColor.GOLD; // 金色
+            case 5 -> NamedTextColor.LIGHT_PURPLE;    // 粉色
+            default -> NamedTextColor.WHITE;
         };
     }
 

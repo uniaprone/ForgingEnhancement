@@ -57,7 +57,12 @@ public class GUIDecorateService {
             level = level - 1;
             if(level < 0) level = 5;
         }
-        border.put(49, decorateItemList.get(level));
+        ItemStack itemStack = new ItemStack(Material.BARRIER);
+        Component nameComponent = Component.text("退出")
+                .color(NamedTextColor.DARK_AQUA)
+                .decorate(TextDecoration.BOLD);
+        itemDisplayService.setCustomName(itemStack, nameComponent);
+        border.put(49, itemStack);
         return border;
     }
 

@@ -38,8 +38,9 @@ public class ItemInfoGUIListener implements Listener {
 
 
         // 可选：添加关闭按钮功能
-        if (event.getSlot() == 26) { // 假设右下角是关闭按钮
-            event.getWhoClicked().closeInventory();
+        if (event.getSlot() == 49) { // 假设右下角是关闭按钮
+            Player player = (Player) event.getWhoClicked();
+            player.closeInventory();
         }
     }
 
@@ -55,7 +56,6 @@ public class ItemInfoGUIListener implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         // 清理资源（如果需要）
         if (event.getInventory().getHolder() instanceof ItemInfoGUIHolder) {
-            // 可以在这里执行一些清理操作
             event.getPlayer().setItemOnCursor(null);
         }
     }

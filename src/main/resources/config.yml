@@ -123,9 +123,9 @@ attributes:
     operation: MULTIPLY_SCALAR_1
     values:
       BROKEN: {min: -0.2, max: -0.1}
-      COMMON: {min: -0.1, max: 0.2}
-      UNCOMMON: {min: 0.2, max: 0.5}
-      EPIC: {min: 0.5, max: 1.0}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
       LEGENDARY: {min: 1.0, max: 1.5}
       MYTHIC: {min: 1.5, max: 2.0}
 
@@ -133,34 +133,34 @@ attributes:
     name: 护甲韧性
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.15}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   knockback_resistance:
     name: 击退抗性
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   max_health:
     name: 生命值
     rare: true
     operation: ADD_NUMBER
     values:
-      BROKEN: {min: 1.0, max: 1.0}
-      COMMON: {min: 1.0, max: 1.0}
-      UNCOMMON: {min: 2.0, max: 2.0}
+      BROKEN: {min: -1.0, max: -1.0}
+      COMMON: {min: 0.5, max: 0.5}
+      UNCOMMON: {min: 1.0, max: 1.0}
       EPIC: {min: 2.0, max: 2.0}
-      LEGENDARY: {min: 4.0, max: 4.0}
+      LEGENDARY: {min: 3.0, max: 3.0}
       MYTHIC: {min: 4.0, max: 4.0}
 
   attack_damage:
@@ -171,30 +171,30 @@ attributes:
       COMMON: {min: -0.1, max: 0.2}
       UNCOMMON: {min: 0.2, max: 0.5}
       EPIC: {min: 0.5, max: 1.0}
-      LEGENDARY: {min: 1.0, max: 1.5}
-      MYTHIC: {min: 1.5, max: 2.0}
+      LEGENDARY: {min: 1.0, max: 2.0}
+      MYTHIC: {min: 2.0, max: 3.0}
 
   attack_knockback:
     name: 击退
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   attack_speed:
     name: 攻击速度
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   gravity:
     name: 重力
@@ -215,19 +215,19 @@ attributes:
       COMMON: {min: -0.1, max: 0.1}
       UNCOMMON: {min: -0.3, max: -0.1}
       EPIC: {min: -0.5, max: -0.3}
-      LEGENDARY: {min: -0.7, max: -0.5}
-      MYTHIC: {min: -0.8, max: -0.7}
+      LEGENDARY: {min: -0.8, max: -0.5}
+      MYTHIC: {min: -1.0, max: -0.8}
 
   explosion_knockback_resistance:
     name: 爆炸击退抗性
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.1}
+      UNCOMMON: {min: 0.1, max: 0.4}
+      EPIC: {min: 0.4, max: 0.6}
+      LEGENDARY: {min: 0.6, max: 0.8}
+      MYTHIC: {min: 0.8, max: 1.0}
 
   oxygen_bonus:
     name: 额外氧气
@@ -244,31 +244,31 @@ attributes:
     name: 潜行速度
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   water_movement_efficiency:
     name: 水中移动效率
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   movement_efficiency:
     name: 移动效率
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.1}
+      UNCOMMON: {min: 0.1, max: 0.15}
       EPIC: {min: 0.15, max: 0.25}
       LEGENDARY: {min: 0.25, max: 0.4}
       MYTHIC: {min: 0.4, max: 0.5}
@@ -278,63 +278,63 @@ attributes:
     rare: true
     operation: ADD_NUMBER
     values:
-      BROKEN: {min: 0.2, max: 0.2}
+      BROKEN: {min: 0.1, max: 0.1}
       COMMON: {min: 0.2, max: 0.2}
-      UNCOMMON: {min: 0.5, max: 0.5}
-      EPIC: {min: 0.5, max: 0.5}
-      LEGENDARY: {min: 1, max: 1}
-      MYTHIC: {min: 1, max: 1}
+      UNCOMMON: {min: 0.3, max: 0.3}
+      EPIC: {min: 0.5, max: 1.5}
+      LEGENDARY: {min: 1.0, max: 1.0}
+      MYTHIC: {min: 2.0, max: 2.0}
 
   sweeping_damage_ratio:
     name: 横扫伤害比率
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   mining_efficiency:
     name: 挖掘效率
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   submerged_mining_speed:
     name: 水下挖掘速度
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: -0.2, max: -0.05}
-      COMMON: {min: -0.05, max: 0.05}
-      UNCOMMON: {min: 0.05, max: 0.1}
-      EPIC: {min: 0.15, max: 0.25}
-      LEGENDARY: {min: 0.25, max: 0.4}
-      MYTHIC: {min: 0.4, max: 0.5}
+      BROKEN: {min: -0.2, max: -0.1}
+      COMMON: {min: -0.1, max: 0.3}
+      UNCOMMON: {min: 0.3, max: 0.8}
+      EPIC: {min: 0.8, max: 1.0}
+      LEGENDARY: {min: 1.0, max: 1.5}
+      MYTHIC: {min: 1.5, max: 2.0}
 
   step_height:
     name: 行走高度
     rare: true
     operation: ADD_NUMBER
     values:
-      BROKEN: {min: 0.2, max: 0.2}
-      COMMON: {min: 0.2, max: 0.2}
+      BROKEN: {min: -0.1, max: -0.1}
+      COMMON: {min: 0.1, max: 0.1}
       UNCOMMON: {min: 0.5, max: 0.5}
-      EPIC: {min: 0.5, max: 0.5}
-      LEGENDARY: {min: 1, max: 1}
-      MYTHIC: {min: 1, max: 1}
+      EPIC: {min: 1.0, max: 1.0}
+      LEGENDARY: {min: 1.5, max: 1}
+      MYTHIC: {min: 2, max: 2}
 
   fall_damage_multiplier:
     name: 摔落伤害倍数
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: 0.1, max: 0.3}
+      BROKEN: {min: 0.1, max: 0.2}
       COMMON: {min: -0.1, max: 0.1}
       UNCOMMON: {min: -0.3, max: -0.1}
       EPIC: {min: -0.5, max: -0.3}
@@ -346,12 +346,12 @@ attributes:
     rare: true
     operation: MULTIPLY_SCALAR_1
     values:
-      BROKEN: {min: 0.1, max: 0.1}
-      COMMON: {min: 0.1, max: 0.1}
-      UNCOMMON: {min: 0.2, max: 0.2}
-      EPIC: {min: 0.2, max: 0.2}
-      LEGENDARY: {min: 0.3, max: 0.3}
-      MYTHIC: {min: 0.3, max: 0.3}
+      BROKEN: {min: -0.1, max: 0.0}
+      COMMON: {min: 0.0, max: 0.1}
+      UNCOMMON: {min: 0.1, max: 0.2}
+      EPIC: {min: 0.2, max: 0.3}
+      LEGENDARY: {min: 0.3, max: 0.4}
+      MYTHIC: {min: 0.4, max: 0.5}
 
   safe_fall_distance:
     name: 安全摔落高度
@@ -361,18 +361,18 @@ attributes:
       BROKEN: {min: 0.5, max: 0.5}
       COMMON: {min: 0.5, max: 0.5}
       UNCOMMON: {min: 1.0, max: 1.0}
-      EPIC: {min: 1.0, max: 1.0}
-      LEGENDARY: {min: 2.0, max: 2.0}
-      MYTHIC: {min: 2.0, max: 2.0}
+      EPIC: {min: 2.0, max: 2.0}
+      LEGENDARY: {min: 2.5, max: 2.5}
+      MYTHIC: {min: 5.0, max: 5.0}
 
   block_interaction_range:
     name: 挖掘距离
     rare: true
     operation: ADD_NUMBER
     values:
-      BROKEN: {min: 0.2, max: 0.2}
+      BROKEN: {min: 0.1, max: 0.1}
       COMMON: {min: 0.2, max: 0.2}
       UNCOMMON: {min: 0.5, max: 0.5}
-      EPIC: {min: 0.5, max: 0.5}
-      LEGENDARY: {min: 1, max: 1}
-      MYTHIC: {min: 1, max: 1}
+      EPIC: {min: 1.0, max: 1.0}
+      LEGENDARY: {min: 1.5, max: 1.5}
+      MYTHIC: {min: 3.0, max: 3.0}

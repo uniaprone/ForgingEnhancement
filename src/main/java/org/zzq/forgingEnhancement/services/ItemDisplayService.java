@@ -69,11 +69,12 @@ public class ItemDisplayService {
             NamedTextColor attrColor = getQualityColor(forgingAttribute.getLevel());
             String valueDisplay = formatAttributeValue(config, forgingAttribute.getValue());
             itemMeta.displayName(Component.text("属性：" + config.name).color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE));
+            Component suffixComponent = Component.text(" 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』").color(attrColor).decorate(TextDecoration.ITALIC);
             if(forgingAttribute.getValue() > 0){
-                Component attributeComponent = Component.text("+" + valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』").color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE);
+                Component attributeComponent = Component.text("+" + valueDisplay).color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE).append(suffixComponent);
                 newLore.add(attributeComponent);
             }else{
-                Component attributeComponent = Component.text(valueDisplay + " 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』").color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE);
+                Component attributeComponent = Component.text(valueDisplay).color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE).append(suffixComponent) ;
                 newLore.add(attributeComponent);
             }
             if(forgingAttribute.isEngraved()){

@@ -10,6 +10,7 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.zzq.forgingEnhancement.managers.PlayerSettingManager;
 import org.zzq.forgingEnhancement.services.*;
 import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
 
@@ -20,9 +21,11 @@ import java.util.List;
 public class ForgingClickListener implements Listener {
     private final ForgingService forgingService;
     private final ItemInfoGUIService itemInfoGUIService;
-    public ForgingClickListener(ForgingService forgingService, ItemInfoGUIService itemInfoGUIService){
+    private final PlayerSettingManager playerSettingManager;
+    public ForgingClickListener(ForgingService forgingService, ItemInfoGUIService itemInfoGUIService, PlayerSettingManager playerSettingManager){
         this.forgingService = forgingService;
         this.itemInfoGUIService = itemInfoGUIService;
+        this.playerSettingManager = playerSettingManager;
     }
 
     @EventHandler
@@ -59,7 +62,7 @@ public class ForgingClickListener implements Listener {
             event.getWhoClicked().setItemOnCursor(resultForgingItem);
             // 更新铁砧结果槽为空
             anvil.setResult(null);
-        }else if(inventoryType == InventoryType.WORKBENCH && event.getRawSlot() == 0){
+        }else if(inventoryType == InventoryType.WORKBENCH && event.getRawSlot() == 0 && playerSettingManager.getPlayerSetting(event.getWhoClicked().getUniqueId())){
             CraftingInventory craftingInventory =  (CraftingInventory) event.getInventory();
             ItemStack resultItem = craftingInventory.getResult();
             if(resultItem == null) return;

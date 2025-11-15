@@ -67,9 +67,9 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     private void registerListeners(){
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new CraftingForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService,this.getLogger()), this);
+        getServer().getPluginManager().registerEvents(new CraftingForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService,this.getLogger(), fileManager.getplayerSettingManager()), this);
         getServer().getPluginManager().registerEvents(new AnvilForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService), this);
-        getServer().getPluginManager().registerEvents(new ForgingClickListener(forgingService, itemInfoGUIService), this);
+        getServer().getPluginManager().registerEvents(new ForgingClickListener(forgingService, itemInfoGUIService,fileManager.getplayerSettingManager()), this);
         getServer().getPluginManager().registerEvents(new ItemInfoGUIListener(this.getLogger(), itemInfoGUIService, attributeBindingService), this);
         getServer().getPluginManager().registerEvents(new AttributeBindingGUIListener(this.getLogger(), attributeBindingService, itemInfoGUIService), this);
     }

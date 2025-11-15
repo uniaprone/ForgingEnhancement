@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
 import org.zzq.forgingEnhancement.ForgingEnhancement;
+import org.zzq.forgingEnhancement.managers.PlayerSettingManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter {
 
     private final ForgingEnhancement plugin;
-    private final List<String> subCommands = Arrays.asList("reload", "give", "info");
+    private final List<String> subCommands = Arrays.asList("reload", "give", "info", "toggle");
     private final List<String> qualities = Arrays.asList("broken","common", "uncommon", "epic", "legendary","mythic");
 
     public ForgingEnhancementCommand(ForgingEnhancement plugin) {
@@ -62,6 +63,13 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
                 }
                 break;
 
+            case "toggle":
+                if(sender instanceof Player){
+                    handelToggleCommand(sender);
+                }else {
+                    sender.sendMessage(ChatColor.RED + "只有玩家可以执行此命令!");
+                }
+                break;
             default:
                 sendHelp(sender);
                 break;
@@ -123,6 +131,18 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
         return completions;
     }
 
+
+    private void handelToggleCommand(CommandSender sender){
+        Player player = (Player) sender;
+        PlayerSettingManager playerSettingManager = plugin.getFileManager().getplayerSettingManager();
+        playerSettingManager.toggleWorkBranchForging(player.getUniqueId(), player.getName());
+        boolean isEnable = playerSettingManager.getPlayerSetting(player.getUniqueId());
+        if(isEnable){
+            sender.sendMessage(ChatColor.GREEN + "工作台锻造模式已开启");
+        }else{
+            sender.sendMessage(ChatColor.RED + "工作台锻造模式已关闭");
+        }
+    }
     private void handleGiveCommand(CommandSender sender, String[] args) {
         if (args.length < 4) {
             sender.sendMessage(ChatColor.RED + "用法: /fe give <玩家> <品质> <数量>");

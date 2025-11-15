@@ -7,6 +7,7 @@ public class FileManager {
     private Plugin plugin;
     private ConfigManager configManager;
     private BaseAttributeManager baseAttributeManager;
+    private PlayerSettingManager playerSettingManager;
 
     public FileManager(Plugin plugin) {
         this.plugin = plugin;
@@ -16,6 +17,7 @@ public class FileManager {
     private void initialize(){
         configManager = new ConfigManager(plugin);
         baseAttributeManager = new BaseAttributeManager(plugin);
+        playerSettingManager = new PlayerSettingManager(plugin);
     }
 
     public ConfigManager getConfigManager() {
@@ -26,8 +28,11 @@ public class FileManager {
         return baseAttributeManager;
     }
 
+    public PlayerSettingManager getplayerSettingManager(){ return playerSettingManager;}
+
     public void reloadFile(){
         configManager.reloadConfig();
         baseAttributeManager.reloadBaseAttribute();
+        playerSettingManager.reload();
     }
 }

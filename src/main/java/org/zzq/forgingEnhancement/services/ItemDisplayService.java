@@ -107,8 +107,6 @@ public class ItemDisplayService {
         List<Component> originalLore = originalMeta.hasLore() ? originalMeta.lore() : new ArrayList<>();
         if (originalLore == null) originalLore = new ArrayList<>();
         // 移除之前由本插件添加的强化信息（如果有的话）
-        logger.info("初始meta " + newMeta);
-        logger.info("初始mlore " + originalLore);
         removeOldForgingLore(originalLore);
 
         List<Component> newLore = new ArrayList<>();
@@ -125,7 +123,7 @@ public class ItemDisplayService {
         Iterator<Component> iterator = Lore.iterator();
         while (iterator.hasNext()) {
             TextComponent line = (TextComponent) iterator.next();
-            logger.info("组件文本" + line.content());
+//            logger.info("组件文本" + line.content());
             if(regxService.loraDetection(line.content())){
                 iterator.remove();
             }

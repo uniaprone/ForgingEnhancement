@@ -19,8 +19,8 @@ public class RegxService {
         for (Pattern pattern : patterns) {
             Matcher matcher = pattern.matcher(str);
             if(matcher.matches()){
-                logger.info("匹配字符串: " + str);
-                logger.info("lora匹配规则: " + pattern + " 匹配结果: " + matcher.group());
+//                logger.info("匹配字符串: " + str);
+//                logger.info("lora匹配规则: " + pattern + " 匹配结果: " + matcher.group());
                 return true;
             }
         }

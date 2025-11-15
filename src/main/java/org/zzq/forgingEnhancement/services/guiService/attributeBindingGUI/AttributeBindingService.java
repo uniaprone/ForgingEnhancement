@@ -63,6 +63,8 @@ public class AttributeBindingService {
         ItemStack attributeItem = attributeBindingHolder.getForgingAttributeItem();
         ItemMeta attributeMete = attributeItem.getItemMeta();
         ForgingAttribute forgingAttribute = nbtService.getForgingAttributeGUINBT(attributeMete);
+        //检查是否已绑定
+        if(forgingAttribute.isEngraved()) return;
         EnhancementResult enhancementResult = nbtService.getForgingNBT(itemMeta);
         for(int i = 0; i < enhancementResult.getAttributeList().size(); i++){
             if(enhancementResult.getAttributeList().get(i).getName().equals(forgingAttribute.getName())){
@@ -70,10 +72,13 @@ public class AttributeBindingService {
                 break;
             }
         }
+        forgingAttribute.setEngraved(true);
         nbtService.storeForgingNBT(itemMeta, enhancementResult);
+        nbtService.storeForgingAttributeGUINBT(attributeMete, forgingAttribute);
         itemDisplayService.addEngravedLora(attributeMete);
         forgingItem.setItemMeta(itemMeta);
         attributeItem.setItemMeta(attributeMete);
+        attributeBindingHolder.setForgingAttributeItem(attributeItem);
         attributeBindingInventory.setItem(1, attributeItem);
         bindingSlotItem.setAmount(bindingSlotItem.getAmount() - 1);
     }
@@ -110,7 +115,9 @@ public class AttributeBindingService {
     }
 
     private boolean checkBindingSlot(ItemStack itemStack){
-        if(itemStack == null || !itemStack.hasItemMeta()) return false;
+        if(itemStack == null) return false;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if(itemMeta == null) return false;
         return engraveStoneManager.isEngraveStone(itemStack);
     }
 

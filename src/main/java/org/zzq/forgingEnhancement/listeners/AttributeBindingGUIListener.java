@@ -44,7 +44,6 @@ public class AttributeBindingGUIListener implements Listener {
         }
 
         if(attributeBindingService.getAttributeBindingHolder().getSlotType(clickSlot)  == AttributeBindingHolder.SlotType.INTERACTIVE){
-            logger.info("交互槽位");
             attributeBindingService.interactiveSlotDetection(event.getCurrentItem());
         }
     }
@@ -52,9 +51,7 @@ public class AttributeBindingGUIListener implements Listener {
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
         // 防止在GUI内拖拽物品
-        logger.info("onInventoryDrag事件: " + event.getType().name());
         if (event.getInventory().getHolder() instanceof AttributeBindingHolder) {
-            logger.info("事件: " + event.getType().name());
 //            event.setCancelled(true);
         }
     }

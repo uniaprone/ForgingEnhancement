@@ -33,6 +33,14 @@ public class AttributeBindingHolder implements InventoryHolder {
         return forgingAttributeItem;
     }
 
+    public void setForgingItem(ItemStack forgingItem) {
+        this.forgingItem = forgingItem;
+    }
+
+    public void setForgingAttributeItem(ItemStack forgingAttributeItem) {
+        this.forgingAttributeItem = forgingAttributeItem;
+    }
+
     private void initializeSlotTypes() {
         // 其他槽位默认为DISPLAY_ONLY
         slotTypes.put(0, SlotType.DISPLAY_ONLY);

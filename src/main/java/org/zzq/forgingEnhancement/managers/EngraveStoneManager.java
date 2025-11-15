@@ -5,6 +5,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.logging.Logger;
+
 public class EngraveStoneManager {
     private KeyManager keyManager;
     public EngraveStoneManager(KeyManager keyManager){
@@ -38,7 +40,7 @@ public class EngraveStoneManager {
     public boolean isEngraveStone(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
         ItemMeta meta = item.getItemMeta();
-        Byte isStone = meta.getPersistentDataContainer().get(keyManager.getForgingStoneKey(), PersistentDataType.BYTE);
+        Byte isStone = meta.getPersistentDataContainer().get(keyManager.getEngraveStoneKey(), PersistentDataType.BYTE);
         return isStone != null && isStone == 1;
     }
 }

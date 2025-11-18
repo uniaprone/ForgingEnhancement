@@ -1,5 +1,6 @@
 package org.zzq.forgingEnhancement.services;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ public class ForgingService {
     private StoneManager stoneManager;
     private KeyManager keyManager;
     private Logger logger;
+    private SoundService soundService;
     private List<ForgingAttribute> engravedAttributes;
     public ForgingService(AttributeService attributeService,
                           EnhancementService enhancementService,
@@ -30,7 +32,8 @@ public class ForgingService {
                           ConfigManager configManager,
                           StoneManager stoneManager,
                           KeyManager keyManager,
-                          Logger logger
+                          Logger logger,
+                          SoundService soundService
     ){
         this.attributeService = attributeService;
         this.enhancementService = enhancementService;
@@ -40,8 +43,9 @@ public class ForgingService {
         this.stoneManager = stoneManager;
         this.keyManager = keyManager;
         this.logger = logger;
+        this.soundService = soundService;
     }
-    public ItemStack enhanceItem(ItemStack resultItem, ItemStack forgingStone){
+    public ItemStack enhanceItem(Player player, ItemStack resultItem, ItemStack forgingStone){
         ItemMeta resultItemMeta = resultItem.getItemMeta();
 
         int baseLevel = stoneManager.getStoneQualityLevel(forgingStone);
@@ -71,6 +75,8 @@ public class ForgingService {
         itemDisplayService.updateItemDisplay(resultItemMeta, resultItem.getItemMeta(), enhancementResult.getLevel(), enhancementResult.getAttributeList());
         //7.应用强化
         resultItem.setItemMeta(resultItemMeta);
+        //8.播放音效
+        soundService.playForgingSound(player);
         //8.返回强化后的物品
         return resultItem;
     }

@@ -54,7 +54,7 @@ public class ForgingClickListener implements Listener {
             }
             event.setCancelled(true); // 取消默认的点击行为
 
-            ItemStack resultForgingItem = forgingService.enhanceItem(resultItem, secondItem);
+            ItemStack resultForgingItem = forgingService.enhanceItem(player, resultItem, secondItem);
 
             anvil.setFirstItem(null);
             anvil.setSecondItem(consumeItem(secondItem));
@@ -85,7 +85,7 @@ public class ForgingClickListener implements Listener {
                 firstItem.setItemMeta(resultItemMeta);
                 resultItem.setItemMeta(resultItemMeta);
             }
-            ItemStack resultForgingItem = forgingService.enhanceItem(resultItem, secondItem);
+            ItemStack resultForgingItem = forgingService.enhanceItem(player, resultItem, secondItem);
 
             event.setCancelled(true); // 取消默认的点击行为
             // 消耗合成网格中的物品

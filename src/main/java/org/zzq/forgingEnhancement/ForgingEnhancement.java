@@ -44,6 +44,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     }
     private void initializeService(){
         RegxService regxService = new RegxService(this.getLogger());
+        SoundService soundService = new SoundService();
         engraveStoneManager = new EngraveStoneManager(keyManager);
         itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService, this.getLogger());
         nbtService = new NBTService(keyManager);
@@ -51,7 +52,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         itemInfoGUIService =  new ItemInfoGUIService(this.getLogger(), nbtService, guiDecorateService);
         AttributeService attributeService = new AttributeService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
         EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager(), stoneManager,this.getLogger());
-        attributeBindingService = new AttributeBindingService(this.getLogger(), nbtService, guiDecorateService, engraveStoneManager, itemDisplayService);
+        attributeBindingService = new AttributeBindingService(this.getLogger(), nbtService, guiDecorateService, engraveStoneManager, itemDisplayService, soundService);
         this.forgingService = new ForgingService(
                 attributeService,
                 enhancementService,
@@ -60,7 +61,8 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
                 fileManager.getConfigManager(),
                 stoneManager,
                 keyManager,
-                this.getLogger()
+                this.getLogger(),
+                soundService
         );
 
     }

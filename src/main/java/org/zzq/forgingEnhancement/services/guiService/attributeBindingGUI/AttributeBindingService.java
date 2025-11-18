@@ -3,6 +3,7 @@ package org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -12,6 +13,7 @@ import org.zzq.forgingEnhancement.models.EnhancementResult;
 import org.zzq.forgingEnhancement.models.ForgingAttribute;
 import org.zzq.forgingEnhancement.services.ItemDisplayService;
 import org.zzq.forgingEnhancement.services.NBTService;
+import org.zzq.forgingEnhancement.services.SoundService;
 import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
 import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIHolder;
 import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
@@ -28,13 +30,15 @@ public class AttributeBindingService {
     private EngraveStoneManager engraveStoneManager;
     private ItemDisplayService itemDisplayService;
     private Inventory attributeBindingInventory;
+    private SoundService soundService;
 
-    public AttributeBindingService(Logger logger, NBTService nbtService, GUIDecorateService guiDecorateService, EngraveStoneManager engraveStoneManager, ItemDisplayService itemDisplayService) {
+    public AttributeBindingService(Logger logger, NBTService nbtService, GUIDecorateService guiDecorateService, EngraveStoneManager engraveStoneManager, ItemDisplayService itemDisplayService, SoundService soundService) {
         this.logger = logger;
         this.nbtService = nbtService;
         this.guiDecorateService = guiDecorateService;
         this.engraveStoneManager =engraveStoneManager;
         this.itemDisplayService = itemDisplayService;
+        this.soundService = soundService;
     }
 
     public void openAttributeBindingGUI(Player player, int clickSlot, ItemStack forgingItem, ItemInfoGUIHolder itemInfoGUIHolder){
@@ -56,7 +60,7 @@ public class AttributeBindingService {
         logger.info("正在编写中...");
     }
 
-    public void confirmLogic(ItemStack bindingSlotItem){
+    public void confirmLogic(Player player, ItemStack bindingSlotItem){
         if(!checkBindingSlot(bindingSlotItem)) return;
         ItemStack forgingItem = attributeBindingHolder.getForgingItem();
         ItemMeta itemMeta = forgingItem.getItemMeta();
@@ -81,6 +85,7 @@ public class AttributeBindingService {
         attributeBindingHolder.setForgingAttributeItem(attributeItem);
         attributeBindingInventory.setItem(1, attributeItem);
         bindingSlotItem.setAmount(bindingSlotItem.getAmount() - 1);
+        soundService.playEngraveSound(player);
     }
 
     public void cancelLogic(ItemStack itemStack, Player player) {

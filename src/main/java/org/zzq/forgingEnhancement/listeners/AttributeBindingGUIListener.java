@@ -35,7 +35,7 @@ public class AttributeBindingGUIListener implements Listener {
         }
         if(attributeBindingService.getAttributeBindingHolder().getSlotType(clickSlot)  == AttributeBindingHolder.SlotType.FUNCTIONAL){
             event.setCancelled(true);
-            if(clickSlot == 6){attributeBindingService.confirmLogic(Objects.requireNonNull(event.getClickedInventory()).getItem(4));}
+            if(clickSlot == 6){attributeBindingService.confirmLogic((Player) event.getWhoClicked(), Objects.requireNonNull(event.getClickedInventory()).getItem(4));}
             if(clickSlot == 7){attributeBindingService.cancelLogic(event.getInventory().getItem(4),(Player) event.getWhoClicked());}
             if(clickSlot == 8){
                 attributeBindingService.closeLogic(event.getInventory().getItem(4),(Player) event.getWhoClicked());

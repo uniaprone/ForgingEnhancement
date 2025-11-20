@@ -24,6 +24,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     private ItemInfoGUIService itemInfoGUIService;
     private AttributeBindingService attributeBindingService;
     private EngraveStoneManager engraveStoneManager;
+    private RandomService randomService;
 
     @Override
     public void onEnable() {
@@ -43,6 +44,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         getLogger().info("锻造增强插件已启用!");
     }
     private void initializeService(){
+        randomService = new RandomService();
         RegxService regxService = new RegxService(this.getLogger());
         SoundService soundService = new SoundService();
         engraveStoneManager = new EngraveStoneManager(keyManager);
@@ -51,7 +53,7 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         GUIDecorateService guiDecorateService = new GUIDecorateService(this.getLogger(), itemDisplayService, nbtService);
         itemInfoGUIService =  new ItemInfoGUIService(this.getLogger(), nbtService, guiDecorateService);
         AttributeService attributeService = new AttributeService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
-        EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager(), stoneManager,this.getLogger());
+        EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager(), stoneManager,this.getLogger(), randomService);
         attributeBindingService = new AttributeBindingService(this.getLogger(), nbtService, guiDecorateService, engraveStoneManager, itemDisplayService, soundService);
         this.forgingService = new ForgingService(
                 attributeService,

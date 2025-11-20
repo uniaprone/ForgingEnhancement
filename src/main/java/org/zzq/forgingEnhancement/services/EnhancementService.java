@@ -3,7 +3,6 @@ package org.zzq.forgingEnhancement.services;
 import org.bukkit.inventory.ItemStack;
 import org.zzq.forgingEnhancement.managers.StoneManager;
 import org.zzq.forgingEnhancement.models.ForgingAttribute;
-import org.zzq.forgingEnhancement.utils.RandomUtil;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
 
@@ -13,15 +12,15 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class EnhancementService {
-    private final Random random;
     private ConfigManager configManager;
     private StoneManager stoneManager;
     private Logger logger;
-    public EnhancementService(ConfigManager configManager, StoneManager stoneManager, Logger logger) {
-        this.random = new Random();
+    private RandomService randomService;
+    public EnhancementService(ConfigManager configManager, StoneManager stoneManager, Logger logger, RandomService randomService) {
         this.configManager = configManager;
         this.stoneManager = stoneManager;
         this.logger = logger;
+        this.randomService = randomService;
     }
 
     /**
@@ -35,7 +34,7 @@ public class EnhancementService {
         // 获取装备类型
         String itemType = configManager.getEquipmentType(item.getType());
         // 计算最终强化等级（基于正态分布）
-        int finalItemLevel = RandomUtil.normalDistribution(stoneLevel, stoneManager.getLevelQualityMap().size() - 1);
+        int finalItemLevel = randomService.normalDistribution(stoneLevel, stoneManager.getLevelQualityMap().size() - 1);
 
         // 计算并选择普通属性
         int maxCommonAttributes = configManager.getEquipmentCommonAttributes(itemType).size();
@@ -55,7 +54,7 @@ public class EnhancementService {
         if (!rareAttributes.isEmpty()) {
             for (String rareAttribute : rareAttributes) {
                 // 根据稀有概率决定是否添加稀有属性
-                double randomValue = random.nextDouble();
+                double randomValue = randomService.nextDouble();
                 if (randomValue < 0.1 + (double)(finalItemLevel + 1) / 30.0){
                     logger.info("随机值" + randomValue + "应用稀有属性" + rareAttribute + "等级" + finalItemLevel);
                     // 添加稀有属性，使用最小属性值
@@ -72,13 +71,13 @@ public class EnhancementService {
     private int calculateAttributeCount(int stoneLevel, int maxAttributes) {
         switch (stoneLevel) {
             case 0, 1:
-                return Math.max((int) Math.round((maxAttributes * (0.2 + random.nextDouble() * (0.2)))), 1);
+                return Math.max((int) Math.round((maxAttributes * (0.2 + randomService.nextDouble() * (0.2)))), 1);
             case 2:
-                return Math.max((int) Math.round((maxAttributes * (0.4 + random.nextDouble() * (0.2)))), 1);
+                return Math.max((int) Math.round((maxAttributes * (0.4 + randomService.nextDouble() * (0.2)))), 1);
             case 3, 4:
-                return Math.max((int) Math.round((maxAttributes * (0.6 + random.nextDouble() * (0.2)))), 1);
+                return Math.max((int) Math.round((maxAttributes * (0.6 + randomService.nextDouble() * (0.2)))), 1);
             case 5:
-                return Math.max((int) Math.round((maxAttributes * (0.8 + random.nextDouble() * (0.2)))), 1);
+                return Math.max((int) Math.round((maxAttributes * (0.8 + randomService.nextDouble() * (0.2)))), 1);
             default:
                 return -1;
         }
@@ -96,13 +95,13 @@ public class EnhancementService {
 
         // 随机调整词条品质，但保持总和不变
         for (int i = 0; i < attributeCount * 2; i++) { // 调整次数
-            int attrIndex1 = random.nextInt(attributeCount);
-            int attrIndex2 = random.nextInt(attributeCount);
+            int attrIndex1 = randomService.nextInt(attributeCount);
+            int attrIndex2 = randomService.nextInt(attributeCount);
 
             if (attrIndex1 == attrIndex2) continue;
 
             // 尝试交换品质点数
-            int diff = random.nextInt(3) - 1; // -1, 0, 或 1
+            int diff = randomService.nextInt(3) - 1; // -1, 0, 或 1
 
             if (canAdjustQuality(attributeLevels[attrIndex1], -diff) &&
                     canAdjustQuality(attributeLevels[attrIndex2], diff)) {
@@ -141,7 +140,7 @@ public class EnhancementService {
         }
 
         if (range != null) {
-            double randomValue = range.min + (random.nextDouble() * (range.max - range.min));
+            double randomValue = range.min + (randomService.nextDouble() * (range.max - range.min));
             BigDecimal bigDecimal = new BigDecimal(Double.toString(randomValue));
             bigDecimal = bigDecimal.setScale(4, RoundingMode.HALF_UP);
             return bigDecimal.doubleValue();

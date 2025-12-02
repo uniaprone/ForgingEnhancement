@@ -72,8 +72,10 @@ public class EnhancementService {
                 return Math.max((int) Math.round((maxAttributes * (0.2 + randomService.nextDouble() * (0.2)))), 1);
             case 2:
                 return Math.max((int) Math.round((maxAttributes * (0.4 + randomService.nextDouble() * (0.2)))), 1);
-            case 3, 4:
+            case 3:
                 return Math.max((int) Math.round((maxAttributes * (0.6 + randomService.nextDouble() * (0.2)))), 1);
+            case 4:
+                return Math.max((int) Math.round((maxAttributes * (0.8 + randomService.nextDouble() * (0.2)))), 1);
             case 5:
                 return Math.max((int) Math.round((maxAttributes * (0.8 + randomService.nextDouble() * (0.2)))), 1);
             default:

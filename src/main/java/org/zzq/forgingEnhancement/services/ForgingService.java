@@ -47,6 +47,8 @@ public class ForgingService {
     }
     public ItemStack enhanceItem(Player player, ItemStack resultItem, ItemStack forgingStone){
         ItemMeta resultItemMeta = resultItem.getItemMeta();
+        String firstItemType = configManager.getEquipmentType(resultItem.getType());
+        if(!configManager.isEnhanceableEquipment(firstItemType)) return null;
 
         int baseLevel = stoneManager.getStoneQualityLevel(forgingStone);
         //1.判断是否是重铸

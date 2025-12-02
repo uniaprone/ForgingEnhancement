@@ -155,18 +155,8 @@ public class ConfigManager {
         return new HashMap<>(attributes);
     }
 
-    // 工具方法：检查物品是否是可强化装备
-    public boolean isEnhanceableEquipment(Material material) {
-        String materialName = material.name();
-        for (String suffix : enhanceableEquipmentSuffixes) {
-            if (materialName.endsWith(suffix)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean isEnhanceableEquipment(String materialName) {
+        if(materialName == null) return false;
         materialName = materialName.toUpperCase();
         for (String suffix : enhanceableEquipmentSuffixes) {
             if (suffix.endsWith(materialName)) {
@@ -193,28 +183,40 @@ public class ConfigManager {
         loadConfig();
     }
 
-    public List<String> getEquipmentCommonAttributes(String type){
-        List<String> equipmentCommonAttributes = new ArrayList<>(attributePool.get(type));
+    public List<String> getEquipmentCommonAttributes(String type) {
+        List<String> equipmentAttributes = attributePool.get(type);
+        if (equipmentAttributes == null) {
+            return new ArrayList<>();
+        }
+
+        List<String> equipmentCommonAttributes = new ArrayList<>(equipmentAttributes);
         Iterator<String> iterable = equipmentCommonAttributes.iterator();
-        while(iterable.hasNext()){
+        while(iterable.hasNext()) {
             String currentAttribute = iterable.next();
-            if(attributes.get(currentAttribute).rare){
+            AttributeConfig config = attributes.get(currentAttribute);
+            if (config != null && config.rare) {
                 iterable.remove();
             }
         }
         return equipmentCommonAttributes;
     }
 
-    public List<String> getEquipmentRareAttributes(String type){
-        List<String> equipmentCommonAttributes = new ArrayList<>(attributePool.get(type));
-        Iterator<String> iterable = equipmentCommonAttributes.iterator();
-        while(iterable.hasNext()){
+    public List<String> getEquipmentRareAttributes(String type) {
+        List<String> equipmentAttributes = attributePool.get(type);
+        if (equipmentAttributes == null) {
+            return new ArrayList<>();
+        }
+
+        List<String> equipmentRareAttributes = new ArrayList<>(equipmentAttributes);
+        Iterator<String> iterable = equipmentRareAttributes.iterator();
+        while(iterable.hasNext()) {
             String currentAttribute = iterable.next();
-            if(!attributes.get(currentAttribute).rare){
+            AttributeConfig config = attributes.get(currentAttribute);
+            if (config == null || !config.rare) {
                 iterable.remove();
             }
         }
-        return equipmentCommonAttributes;
+        return equipmentRareAttributes;
     }
 
     public double getRareChance() {

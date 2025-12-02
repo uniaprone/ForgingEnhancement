@@ -55,9 +55,7 @@ public class EnhancementService {
             for (String rareAttribute : rareAttributes) {
                 // 根据稀有概率决定是否添加稀有属性
                 double randomValue = randomService.nextDouble();
-                if (randomValue < 0.1 + (double)(finalItemLevel + 1) / 30.0){
-                    logger.info("随机值" + randomValue + "应用稀有属性" + rareAttribute + "等级" + finalItemLevel);
-                    // 添加稀有属性，使用最小属性值
+                if (randomValue < 0.1 + (double)(finalItemLevel + 1) / 30.0){// 添加稀有属性，使用最小属性值
                     enhancements.add(new ForgingAttribute(rareAttribute, finalItemLevel,
                             configManager.getAttributeConfig(rareAttribute).values.get(
                                    stoneManager.getLevelQualityMap().get(finalItemLevel)).min));

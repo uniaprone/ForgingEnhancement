@@ -3,7 +3,8 @@ version: '1.0-SNAPSHOT'
 main: org.zzq.forgingEnhancement.ForgingEnhancement
 api-version: '1.21'
 author: zzq
-description: 为铁砧锻造添加速度属性增强
+description: 锻造添加性增强
+folia-supported: true
 
 commands:
   forgingenhancement:

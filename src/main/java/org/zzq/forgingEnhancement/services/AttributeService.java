@@ -67,10 +67,7 @@ public class AttributeService {
             return;
         }
 
-        logger.info("为 " + material + " (" + equipmentType + ") 应用 " + baseAttrs.size() + " 个基础属性");
-
         for (Map.Entry<String, Double> attribute : baseAttributeManager.getBaseAttributes(material).entrySet()){
-
             org.bukkit.attribute.Attribute bukkitAttribute = getBukkitAttribute(attribute.getKey());
             if (bukkitAttribute == null) {
                 logger.warning("未知的基础属性: " + attribute);
@@ -82,17 +79,18 @@ public class AttributeService {
             switch (attribute.getKey()) {
                 case "attack_damage" -> baseAttrNamespaceKey = NamespacedKey.minecraft("base_attack_damage");
                 case "attack_speed" -> baseAttrNamespaceKey = NamespacedKey.minecraft("base_attack_speed");
-                case "armor", "knockback_resistance" -> {
-                    if (material.name().equalsIgnoreCase("_helmet")) {
+                case "armor", "armor_toughness", "knockback_resistance" -> {
+                    String materialName = material.name().toLowerCase();
+                    if (materialName.contains("_helmet")) {
                         baseAttrNamespaceKey = NamespacedKey.minecraft("armor.helmet");
                     }
-                    if (material.name().equalsIgnoreCase("_chestplate")) {
+                    if (materialName.contains("_chestplate")) {
                         baseAttrNamespaceKey = NamespacedKey.minecraft("armor.chestplate");
                     }
-                    if (material.name().equalsIgnoreCase("_leggings")) {
+                    if (materialName.contains("_leggings")) {
                         baseAttrNamespaceKey = NamespacedKey.minecraft("armor.leggings");
                     }
-                    if (material.name().equalsIgnoreCase("_boots")) {
+                    if (materialName.contains("_boots")) {
                         baseAttrNamespaceKey = NamespacedKey.minecraft("armor.boots");
                     }
                 }
@@ -105,7 +103,6 @@ public class AttributeService {
                     material.getEquipmentSlot().getGroup()
             );
             meta.addAttributeModifier(bukkitAttribute, baseAttrModifier);
-            logger.info("应用基础属性: " + attribute.getKey() + " = " + attribute.getValue() + " (" + material.getEquipmentSlot().getGroup() + ")");
         }
     }
 

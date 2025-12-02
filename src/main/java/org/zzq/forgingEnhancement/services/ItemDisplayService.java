@@ -123,7 +123,6 @@ public class ItemDisplayService {
         Iterator<Component> iterator = Lore.iterator();
         while (iterator.hasNext()) {
             TextComponent line = (TextComponent) iterator.next();
-//            logger.info("组件文本" + line.content());
             if(regxService.loraDetection(line.content())){
                 iterator.remove();
             }

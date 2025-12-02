@@ -15,7 +15,7 @@ base_attributes:
     netherite_helmet:
       armor: 3
       armor_toughness: 3
-      knockback_resistance: 1
+      knockback_resistance: 0.1
 
   # 胸甲
   chestplate:
@@ -33,7 +33,7 @@ base_attributes:
     netherite_chestplate:
       armor: 8
       armor_toughness: 3
-      knockback_resistance: 1
+      knockback_resistance: 0.1
   # 护腿
   leggings:
     leather_leggings:
@@ -50,7 +50,7 @@ base_attributes:
     netherite_leggings:
       armor: 6
       armor_toughness: 3
-      knockback_resistance: 1
+      knockback_resistance: 0.1
   # 靴子
   boots:
     leather_boots:
@@ -67,7 +67,7 @@ base_attributes:
     netherite_boots:
       armor: 3
       armor_toughness: 3
-      knockback_resistance: 1
+      knockback_resistance: 0.1
   # 剑
   sword:
     wooden_sword:

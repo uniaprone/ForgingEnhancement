@@ -32,14 +32,12 @@ public class ForgingClickListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         InventoryType inventoryType = event.getInventory().getType();
         ClickType clickType = event.getClick();
-        forgingService.getLogger().info("点击类型: " + clickType);
         if(!(event.getWhoClicked() instanceof Player)){
             return;
         }
         Player player = (Player) event.getWhoClicked();
         if(clickType.isRightClick()){
             if(itemInfoGUIService.isValidInput(player, event.getCurrentItem())){
-                forgingService.getLogger().info("物品名称-1:"+ event.getCurrentItem());
                 itemInfoGUIService.openItemInfoGUI(player, event.getCurrentItem());
             }
         }
@@ -55,7 +53,7 @@ public class ForgingClickListener implements Listener {
             event.setCancelled(true); // 取消默认的点击行为
 
             ItemStack resultForgingItem = forgingService.enhanceItem(player, resultItem, secondItem);
-
+            if(resultForgingItem == null) return;
             anvil.setFirstItem(null);
             anvil.setSecondItem(consumeItem(secondItem));
             // 手动设置光标物品
@@ -114,7 +112,6 @@ public class ForgingClickListener implements Listener {
     private void consumeMatrixItems(CraftingInventory craftingInventory, ItemStack[] matrix) {
         // 创建新的矩阵副本用于更新
         ItemStack[] newMatrix = matrix.clone();
-        forgingService.getLogger().info(newMatrix.length + "newMatrix.length");
         // 遍历所有槽位，找到第一个有物品的槽位并消耗
         for (int i = 0; i < newMatrix.length; i++) {
             ItemStack item = newMatrix[i];

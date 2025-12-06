@@ -121,7 +121,11 @@ public class AttributeService {
 
         // 创建唯一标识符
         NamespacedKey modifierKey = keyManager.createUniqueKey(forgingAttribute.getName());
-
+        String materialName = material.name().toLowerCase();
+        if(materialName.contains("_helmet")) modifierKey = keyManager.createUniqueKey("armor.helmet");
+        else if (materialName.contains("_chestplate")) modifierKey = keyManager.createUniqueKey("armor.chestplate");
+        else if (materialName.contains("_leggings")) modifierKey = keyManager.createUniqueKey("armor.leggings");
+        else if (materialName.contains("_boots")) modifierKey = keyManager.createUniqueKey("armor.boots");
         // 创建属性修饰符，使用原物品对应的槽位
         AttributeModifier modifier = new AttributeModifier(
                 modifierKey,

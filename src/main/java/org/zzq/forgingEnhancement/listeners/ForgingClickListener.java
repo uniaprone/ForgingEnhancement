@@ -50,10 +50,10 @@ public class ForgingClickListener implements Listener {
             if (firstItem == null || secondItem == null || resultItem == null || !forgingService.isForgingStone(secondItem)) {
                 return;
             }
-            event.setCancelled(true); // 取消默认的点击行为
-
             ItemStack resultForgingItem = forgingService.enhanceItem(player, resultItem, secondItem);
             if(resultForgingItem == null) return;
+
+            event.setCancelled(true); // 取消默认的点击行为
             anvil.setFirstItem(null);
             anvil.setSecondItem(consumeItem(secondItem));
             // 手动设置光标物品
@@ -84,7 +84,7 @@ public class ForgingClickListener implements Listener {
                 resultItem.setItemMeta(resultItemMeta);
             }
             ItemStack resultForgingItem = forgingService.enhanceItem(player, resultItem, secondItem);
-
+            if(resultForgingItem == null) return;
             event.setCancelled(true); // 取消默认的点击行为
             // 消耗合成网格中的物品
             consumeMatrixItems(craftingInventory, matrix);

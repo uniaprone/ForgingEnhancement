@@ -157,11 +157,11 @@ attributes:
     operation: ADD_NUMBER
     values:
       BROKEN: {min: -1.0, max: -1.0}
-      COMMON: {min: 0.5, max: 0.5}
-      UNCOMMON: {min: 1.0, max: 1.0}
-      EPIC: {min: 2.0, max: 2.0}
-      LEGENDARY: {min: 3.0, max: 3.0}
-      MYTHIC: {min: 4.0, max: 4.0}
+      COMMON: {min: 1.0, max: 1.0}
+      UNCOMMON: {min: 2.0, max: 2.0}
+      EPIC: {min: 3.0, max: 3.0}
+      LEGENDARY: {min: 4.0, max: 4.0}
+      MYTHIC: {min: 5.0, max: 5.0}
 
   attack_damage:
     name: 攻击伤害
@@ -213,10 +213,10 @@ attributes:
     values:
       BROKEN: {min: 0.1, max: 0.3}
       COMMON: {min: -0.1, max: 0.1}
-      UNCOMMON: {min: -0.3, max: -0.1}
-      EPIC: {min: -0.8, max: -0.5}
-      LEGENDARY: {min: -1.0, max: -0.8}
-      MYTHIC: {min: -1.5, max: -1.0}
+      UNCOMMON: {min: -0.2, max: -0.1}
+      EPIC: {min: -0.4, max: -0.2}
+      LEGENDARY: {min: -0.6, max: -0.4}
+      MYTHIC: {min: -0.8, max: -0.6}
 
   explosion_knockback_resistance:
     name: 爆炸击退抗性
@@ -224,10 +224,10 @@ attributes:
     values:
       BROKEN: {min: -0.2, max: -0.1}
       COMMON: {min: -0.1, max: 0.1}
-      UNCOMMON: {min: 0.1, max: 0.4}
-      EPIC: {min: 0.4, max: 0.6}
-      LEGENDARY: {min: 0.6, max: 0.8}
-      MYTHIC: {min: 0.8, max: 1.0}
+      UNCOMMON: {min: 0.1, max: 0.2}
+      EPIC: {min: 0.2, max: 0.4}
+      LEGENDARY: {min: 0.4, max: 0.6}
+      MYTHIC: {min: 0.6, max: 0.8}
 
   oxygen_bonus:
     name: 额外氧气
@@ -325,10 +325,10 @@ attributes:
     values:
       BROKEN: {min: -0.1, max: -0.1}
       COMMON: {min: 0.1, max: 0.1}
-      UNCOMMON: {min: 0.5, max: 0.5}
-      EPIC: {min: 1.0, max: 1.0}
-      LEGENDARY: {min: 1.5, max: 1.5}
-      MYTHIC: {min: 2, max: 2}
+      UNCOMMON: {min: 0.2, max: 0.2}
+      EPIC: {min: 0.5, max: 0.5}
+      LEGENDARY: {min: 1, max: 1}
+      MYTHIC: {min: 1, max: 1}
 
   fall_damage_multiplier:
     name: 摔落伤害倍数

@@ -1,5 +1,6 @@
 package org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI;
 
+import com.google.gson.Gson;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -7,8 +8,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
-import org.zzq.forgingEnhancement.services.NBTService;
 import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
 
 import java.util.HashMap;
@@ -17,13 +19,14 @@ import java.util.logging.Logger;
 
 public class ItemInfoGUIService {
     private Logger logger;
-    private NBTService nbtService;
     private GUIDecorateService guiDecorateService;
     private ItemInfoGUIHolder inventoryHolder;
-    public ItemInfoGUIService(Logger logger, NBTService nbtService, GUIDecorateService guiDecorateService) {
+    private KeyManager keyManager;
+    private Gson gson = new Gson();
+    public ItemInfoGUIService(Logger logger, KeyManager keyManager, GUIDecorateService guiDecorateService) {
         this.logger = logger;
-        this.nbtService = nbtService;
         this.guiDecorateService = guiDecorateService;
+        this.keyManager = keyManager;
     }
 
     public void openItemInfoGUI(Player player, ItemStack item){
@@ -31,8 +34,9 @@ public class ItemInfoGUIService {
         Map<Integer, ItemStack> slotMap = new HashMap<>();
         Map<Integer, ItemStack> forgingItem = guiDecorateService.placeForgingItem(item);
         slotMap.putAll(forgingItem);
-        if(nbtService.hasForgingNBT(itemMeta)){
-            EnhancementResult enhancementResult = nbtService.getForgingNBT(itemMeta);
+        if(itemMeta.getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING) != null){
+            String AttributesString = itemMeta.getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING);
+            EnhancementResult enhancementResult = gson.fromJson(AttributesString, EnhancementResult.class);
             Map<Integer, ItemStack> border = guiDecorateService.itemInfoGUIBorder(enhancementResult.getLevel());
             slotMap.putAll(border);
             Map<Integer, ItemStack> forgingAttributeSlots = guiDecorateService.forgingAttributeSlots(enhancementResult.getAttributeList());
@@ -46,7 +50,7 @@ public class ItemInfoGUIService {
     }
 
     public boolean isValidInput(Player player, ItemStack item){
-        return player != null && item != null && item.hasItemMeta() && item.getItemMeta() != null && nbtService.hasForgingNBT(item.getItemMeta());
+        return player != null && item != null && item.hasItemMeta() && item.getItemMeta() != null && item.getItemMeta().getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING) != null;
     }
 
     private Component getDisplayName(ItemStack itemStack){

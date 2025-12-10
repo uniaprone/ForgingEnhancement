@@ -1,51 +1,52 @@
 package org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI;
 
+import com.google.gson.Gson;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
 import org.zzq.forgingEnhancement.managers.EngraveStoneManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
 import org.zzq.forgingEnhancement.models.ForgingAttribute;
-import org.zzq.forgingEnhancement.services.ItemDisplayService;
-import org.zzq.forgingEnhancement.services.NBTService;
-import org.zzq.forgingEnhancement.services.SoundService;
+import org.zzq.forgingEnhancement.utils.SoundUtil;
 import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
 import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIHolder;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 public class AttributeBindingService {
     private Logger logger;
-    private NBTService nbtService;
     private GUIDecorateService guiDecorateService;
     private AttributeBindingHolder attributeBindingHolder;
     private EngraveStoneManager engraveStoneManager;
-    private ItemDisplayService itemDisplayService;
     private Inventory attributeBindingInventory;
-    private SoundService soundService;
+    private SoundUtil soundUtil;
+    private KeyManager keyManager;
+    private final Gson gson = new Gson();
 
-    public AttributeBindingService(Logger logger, NBTService nbtService, GUIDecorateService guiDecorateService, EngraveStoneManager engraveStoneManager, ItemDisplayService itemDisplayService, SoundService soundService) {
+    public AttributeBindingService(Logger logger, KeyManager keyManager, GUIDecorateService guiDecorateService, EngraveStoneManager engraveStoneManager, SoundUtil soundUtil) {
         this.logger = logger;
-        this.nbtService = nbtService;
         this.guiDecorateService = guiDecorateService;
         this.engraveStoneManager =engraveStoneManager;
-        this.itemDisplayService = itemDisplayService;
-        this.soundService = soundService;
+        this.soundUtil = soundUtil;
+        this.keyManager = keyManager;
     }
 
     public void openAttributeBindingGUI(Player player, int clickSlot, ItemStack forgingItem, ItemInfoGUIHolder itemInfoGUIHolder){
         ItemStack item = itemInfoGUIHolder.getSlotMap().get(clickSlot);
         if(!isValidInput(player, item)) return;
         ItemMeta itemMeta = item.getItemMeta();
-        ForgingAttribute forgingAttribute = nbtService.getForgingAttributeGUINBT(itemMeta);
+        String attributeString = itemMeta.getPersistentDataContainer().get(keyManager.getForgingAttributeGUIKey(), PersistentDataType.STRING);
+        ForgingAttribute forgingAttribute = gson.fromJson(attributeString, ForgingAttribute.class);
         Component titleComponent = getDisplayName(item);
         attributeBindingHolder = new AttributeBindingHolder(forgingItem, item);
         attributeBindingInventory = Bukkit.createInventory(attributeBindingHolder, 9, titleComponent);
@@ -66,10 +67,12 @@ public class AttributeBindingService {
         ItemMeta itemMeta = forgingItem.getItemMeta();
         ItemStack attributeItem = attributeBindingHolder.getForgingAttributeItem();
         ItemMeta attributeMete = attributeItem.getItemMeta();
-        ForgingAttribute forgingAttribute = nbtService.getForgingAttributeGUINBT(attributeMete);
+        String attributeString1 = attributeMete.getPersistentDataContainer().get(keyManager.getForgingAttributeGUIKey(), PersistentDataType.STRING);
+        ForgingAttribute forgingAttribute = gson.fromJson(attributeString1, ForgingAttribute.class);
         //检查是否已绑定
         if(forgingAttribute.isEngraved()) return;
-        EnhancementResult enhancementResult = nbtService.getForgingNBT(itemMeta);
+        String AttributesString2 = itemMeta.getPersistentDataContainer().get(keyManager.getEnhancementKey(), PersistentDataType.STRING);
+        EnhancementResult enhancementResult = gson.fromJson(AttributesString2, EnhancementResult.class);
         for(int i = 0; i < enhancementResult.getAttributeList().size(); i++){
             if(enhancementResult.getAttributeList().get(i).getName().equals(forgingAttribute.getName())){
                 enhancementResult.getAttributeList().get(i).setEngraved(true);
@@ -77,15 +80,20 @@ public class AttributeBindingService {
             }
         }
         forgingAttribute.setEngraved(true);
-        nbtService.storeForgingNBT(itemMeta, enhancementResult);
-        nbtService.storeForgingAttributeGUINBT(attributeMete, forgingAttribute);
-        itemDisplayService.addEngravedLora(attributeMete);
+
+        String AttributeString3 = gson.toJson(enhancementResult);
+        itemMeta.getPersistentDataContainer().set(keyManager.getEnhancementKey(),  PersistentDataType.STRING, AttributeString3);
+
+        String AttributeString4 = gson.toJson(forgingAttribute);
+        attributeMete.getPersistentDataContainer().set(keyManager.getForgingAttributeGUIKey(),  PersistentDataType.STRING, AttributeString4);
+
+        addEngravedLora(attributeMete);
         forgingItem.setItemMeta(itemMeta);
         attributeItem.setItemMeta(attributeMete);
         attributeBindingHolder.setForgingAttributeItem(attributeItem);
         attributeBindingInventory.setItem(1, attributeItem);
         bindingSlotItem.setAmount(bindingSlotItem.getAmount() - 1);
-        soundService.playEngraveSound(player);
+        soundUtil.playEngraveSound(player);
     }
 
     public void cancelLogic(ItemStack itemStack, Player player) {
@@ -116,7 +124,7 @@ public class AttributeBindingService {
     }
 
     public boolean isValidInput(Player player, ItemStack item){
-        return player != null && item != null && item.hasItemMeta() && item.getItemMeta() != null && nbtService.hasForgingAttributeGUINBT(item.getItemMeta());
+        return player != null && item != null && item.hasItemMeta() && item.getItemMeta() != null && item.getItemMeta().getPersistentDataContainer().get(keyManager.getForgingAttributeGUIKey(), PersistentDataType.STRING) != null;
     }
 
     private boolean checkBindingSlot(ItemStack itemStack){
@@ -134,6 +142,16 @@ public class AttributeBindingService {
         else{
             return Component.text("属性");
         }
+    }
+
+    public void addEngravedLora(ItemMeta itemMeta){
+        List<Component> originLore = itemMeta.lore();
+        if (originLore != null) {
+            originLore.add(originLore.size() ,Component.text("已铭刻").color(NamedTextColor.DARK_GRAY));
+        }else{
+            originLore = List.of(Component.text("已铭刻").color(NamedTextColor.DARK_GRAY));
+        }
+        itemMeta.lore(originLore);
     }
 
     public AttributeBindingHolder getAttributeBindingHolder() {

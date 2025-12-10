@@ -6,12 +6,15 @@ import org.zzq.forgingEnhancement.commands.ForgingEnhancementCommand;
 import org.zzq.forgingEnhancement.listeners.*;
 import org.zzq.forgingEnhancement.managers.EngraveStoneManager;
 import org.zzq.forgingEnhancement.managers.FileManager;
-import org.zzq.forgingEnhancement.managers.KeyManager;
+import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
 import org.zzq.forgingEnhancement.services.*;
 import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
 import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
 import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingService;
+import org.zzq.forgingEnhancement.utils.RandomUtil;
+import org.zzq.forgingEnhancement.utils.RegxUtil;
+import org.zzq.forgingEnhancement.utils.SoundUtil;
 
 public class ForgingEnhancement extends JavaPlugin implements Listener {
 
@@ -19,12 +22,10 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     private KeyManager keyManager;
     private StoneManager stoneManager;
     private ForgingService forgingService;
-    private NBTService nbtService;
-    private ItemDisplayService itemDisplayService;
     private ItemInfoGUIService itemInfoGUIService;
     private AttributeBindingService attributeBindingService;
     private EngraveStoneManager engraveStoneManager;
-    private RandomService randomService;
+    private RandomUtil randomUtil;
 
     @Override
     public void onEnable() {
@@ -44,35 +45,30 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         getLogger().info("锻造增强插件已启用!");
     }
     private void initializeService(){
-        randomService = new RandomService();
-        RegxService regxService = new RegxService(this.getLogger());
-        SoundService soundService = new SoundService();
+        randomUtil = new RandomUtil();
+        SoundUtil soundUtil = new SoundUtil();
         engraveStoneManager = new EngraveStoneManager(keyManager);
-        itemDisplayService = new ItemDisplayService(fileManager.getConfigManager(), regxService, this.getLogger());
-        nbtService = new NBTService(keyManager);
-        GUIDecorateService guiDecorateService = new GUIDecorateService(this.getLogger(), itemDisplayService, nbtService);
-        itemInfoGUIService =  new ItemInfoGUIService(this.getLogger(), nbtService, guiDecorateService);
+        GUIDecorateService guiDecorateService = new GUIDecorateService(this.getLogger(), fileManager.getConfigManager(), keyManager);
+        itemInfoGUIService =  new ItemInfoGUIService(this.getLogger(), keyManager, guiDecorateService);
         AttributeService attributeService = new AttributeService(getLogger(), fileManager.getConfigManager(), fileManager.getBaseAttributeManager(), keyManager);
-        EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager(), stoneManager,this.getLogger(), randomService);
-        attributeBindingService = new AttributeBindingService(this.getLogger(), nbtService, guiDecorateService, engraveStoneManager, itemDisplayService, soundService);
+        EnhancementService enhancementService = new EnhancementService(fileManager.getConfigManager(), stoneManager,this.getLogger());
+        attributeBindingService = new AttributeBindingService(this.getLogger(), keyManager, guiDecorateService, engraveStoneManager, soundUtil);
         this.forgingService = new ForgingService(
                 attributeService,
                 enhancementService,
-                itemDisplayService,
-                nbtService,
                 fileManager.getConfigManager(),
                 stoneManager,
                 keyManager,
                 this.getLogger(),
-                soundService
+                soundUtil
         );
 
     }
 
     private void registerListeners(){
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new CraftingForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService,this.getLogger(), fileManager.getplayerSettingManager()), this);
-        getServer().getPluginManager().registerEvents(new AnvilForgingListener(fileManager.getConfigManager(), stoneManager, itemDisplayService), this);
+        getServer().getPluginManager().registerEvents(new CraftingForgingListener(fileManager.getConfigManager(), stoneManager,this.getLogger(), fileManager.getplayerSettingManager()), this);
+        getServer().getPluginManager().registerEvents(new AnvilForgingListener(fileManager.getConfigManager(), stoneManager), this);
         getServer().getPluginManager().registerEvents(new ForgingClickListener(forgingService, itemInfoGUIService,fileManager.getplayerSettingManager()), this);
         getServer().getPluginManager().registerEvents(new ItemInfoGUIListener(this.getLogger(), itemInfoGUIService, attributeBindingService), this);
         getServer().getPluginManager().registerEvents(new AttributeBindingGUIListener(this.getLogger(), attributeBindingService, itemInfoGUIService), this);

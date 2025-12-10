@@ -7,7 +7,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.zzq.forgingEnhancement.managers.BaseAttributeManager;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
-import org.zzq.forgingEnhancement.managers.KeyManager;
+import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
 import org.zzq.forgingEnhancement.models.EnhancementResult;
 import org.zzq.forgingEnhancement.models.ForgingAttribute;
 

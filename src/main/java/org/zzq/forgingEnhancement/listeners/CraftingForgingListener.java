@@ -1,5 +1,8 @@
 package org.zzq.forgingEnhancement.listeners;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -16,7 +19,8 @@ import org.zzq.forgingEnhancement.managers.BaseAttributeManager;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.managers.PlayerSettingManager;
 import org.zzq.forgingEnhancement.managers.StoneManager;
-import org.zzq.forgingEnhancement.services.ItemDisplayService;
+import org.zzq.forgingEnhancement.utils.ColorUtil;
+import org.zzq.forgingEnhancement.utils.RegxUtil;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -25,12 +29,10 @@ import java.util.logging.Logger;
 public class CraftingForgingListener implements Listener {
     private final ConfigManager configManager;
     private final PlayerSettingManager playerSettingManager;
-    private ItemDisplayService itemDisplayService;
     private Logger logger;
 
-    public CraftingForgingListener(ConfigManager configManager, StoneManager stoneManager, ItemDisplayService itemDisplayService,Logger logger, PlayerSettingManager playerSettingManager) {
+    public CraftingForgingListener(ConfigManager configManager, StoneManager stoneManager,Logger logger, PlayerSettingManager playerSettingManager) {
         this.configManager = configManager;
-        this.itemDisplayService = itemDisplayService;
         this.logger = logger;
         this.playerSettingManager = playerSettingManager;
     }
@@ -39,7 +41,7 @@ public class CraftingForgingListener implements Listener {
     @EventHandler
     public void onWorkbenchCraft(PrepareItemCraftEvent event) {
         // 1. 检查关键依赖是否注入成功
-        if (playerSettingManager == null || configManager == null || itemDisplayService == null) {
+        if (playerSettingManager == null || configManager == null) {
             logger.severe("[ForgingEnhancement] 关键依赖未正确初始化，事件处理已跳过。");
             return;
         }
@@ -101,11 +103,38 @@ public class CraftingForgingListener implements Listener {
 
             // 8. 调用显示服务
             try {
-                itemDisplayService.updatePrepareAnvilDisplay(resultItemMeta, originalItemMeta, 1);
+                updatePrepareAnvilDisplay(resultItemMeta, originalItemMeta, 1);
                 result.setItemMeta(resultItemMeta);
                 craftingInventory.setResult(result);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "[ForgingEnhancement] 在更新物品显示时发生错误", e);
+            }
+        }
+    }
+
+    public void updatePrepareAnvilDisplay(ItemMeta newMeta, ItemMeta originalMeta, int itemQualityLevel){
+        // 获取原有Lore
+        List<Component> originalLore = originalMeta.hasLore() ? originalMeta.lore() : new ArrayList<>();
+        if (originalLore == null) originalLore = new ArrayList<>();
+        // 移除之前由本插件添加的强化信息（如果有的话）
+        removeOldForgingLore(originalLore);
+
+        List<Component> newLore = new ArrayList<>();
+
+        // 添加品质信息
+        NamedTextColor qualityColor = ColorUtil.getColorByLevel(itemQualityLevel);
+        Component unKnowComponent = Component.text("品质: " + "???").color(qualityColor);
+        newLore.add(unKnowComponent);
+        newLore.addAll(originalLore);
+        newMeta.lore(newLore);
+    }
+
+    private void removeOldForgingLore(List<Component> Lore){
+        Iterator<Component> iterator = Lore.iterator();
+        while (iterator.hasNext()) {
+            TextComponent line = (TextComponent) iterator.next();
+            if(RegxUtil.loraDetection(line.content())){
+                iterator.remove();
             }
         }
     }

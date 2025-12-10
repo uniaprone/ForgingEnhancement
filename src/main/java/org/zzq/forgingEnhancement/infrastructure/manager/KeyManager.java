@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.managers;
+package org.zzq.forgingEnhancement.infrastructure.manager;
 
 import org.bukkit.NamespacedKey;
 import org.zzq.forgingEnhancement.ForgingEnhancement;

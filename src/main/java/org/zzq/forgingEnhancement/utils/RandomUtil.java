@@ -1,10 +1,10 @@
-package org.zzq.forgingEnhancement.services;
+package org.zzq.forgingEnhancement.utils;
 
 import java.util.Random;
 
-public class RandomService {
-    Random random = new Random();
-    public int normalDistribution(int baseLevel, int maxLevel) {
+public class RandomUtil {
+    static Random random = new Random();
+    public static int normalDistribution(int baseLevel, int maxLevel) {
 
         // 使用正态分布，均值为基础品质等级，标准差为1.0
         double standardDeviation = 0.4;
@@ -38,11 +38,11 @@ public class RandomService {
         return newLevel;
     }
 
-    public double nextDouble(){
+    public static double nextDouble(){
         return random.nextDouble();
     }
 
-    public int nextInt(int bound){
+    public static int nextInt(int bound){
         return random.nextInt(bound);
     }
 }

@@ -3,9 +3,11 @@ package org.zzq.forgingEnhancement.infrastructure.yaml.parser;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.zzq.forgingEnhancement.domain.config.ForgingAttributePoolConfig;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributePoolConfig;
+import org.zzq.forgingEnhancement.domain.valueobject.EquipmentAttribute;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,7 @@ public class YamlForgingAttributePoolParser {
         this.plugin = plugin;
     }
 
-    public Map<String, ForgingAttributePoolConfig> load(){
+    public ForgingAttributePoolConfig load(){
         try{
             file = new File(plugin.getDataFolder(), "forging_attribute_pool.yml");
             if(!file.exists()){
@@ -27,7 +29,7 @@ public class YamlForgingAttributePoolParser {
                 file = new File(plugin.getDataFolder(), "forging_attribute_pool.yml");
             }
             fileConfiguration = YamlConfiguration.loadConfiguration(file);
-            Map<String, ForgingAttributePoolConfig> map = parse();
+            ForgingAttributePoolConfig map = parse();
             plugin.getLogger().info("读取锻造属性池成功!");
             return map;
         }catch (Exception e){
@@ -37,13 +39,18 @@ public class YamlForgingAttributePoolParser {
         }
     }
 
-    public Map<String, ForgingAttributePoolConfig> parse(){
+    public ForgingAttributePoolConfig parse(){
         if(!fileConfiguration.contains("attribute_pool")) return null;
-        Map<String, ForgingAttributePoolConfig> map = new HashMap<>();
+
+        List<String> forgeableEquipments = new ArrayList<>();
+        Map<String, EquipmentAttribute> map = new HashMap<>();
+
+        forgeableEquipments = fileConfiguration.getStringList("forgeable_equipment");
+
         for (String key : fileConfiguration.getConfigurationSection("attribute_pool").getKeys(false)){
             List<String> attributes = fileConfiguration.getStringList("attribute_pool." + key);
-            map.put(key, new ForgingAttributePoolConfig(key, attributes));
+            map.put(key, new EquipmentAttribute(key, attributes));
         }
-        return map;
+        return new ForgingAttributePoolConfig(forgeableEquipments, map);
     }
 }

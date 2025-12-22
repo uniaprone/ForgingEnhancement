@@ -1,10 +1,9 @@
-package org.zzq.forgingEnhancement.managers;
+package org.zzq.forgingEnhancement.infrastructure.manager;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
 
 public class EngraveStoneManager {
     private KeyManager keyManager;

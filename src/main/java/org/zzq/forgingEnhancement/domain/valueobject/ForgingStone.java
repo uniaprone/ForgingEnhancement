@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.domain.model;
+package org.zzq.forgingEnhancement.domain.valueobject;
 
 public enum ForgingStone {
     BROKEN(0, "破损", "§8"),
@@ -28,5 +28,14 @@ public enum ForgingStone {
 
     public String getColor() {
         return color;
+    }
+
+    public static boolean isMatchForgingStone(String quality){
+        for (ForgingStone forgingStone: ForgingStone.values()){
+            if(forgingStone.name().equalsIgnoreCase(quality)){
+                return true;
+            }
+        }
+        return false;
     }
 }

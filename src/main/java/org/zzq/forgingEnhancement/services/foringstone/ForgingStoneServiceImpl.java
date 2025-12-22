@@ -1,8 +1,8 @@
 package org.zzq.forgingEnhancement.services.foringstone;
 
 import org.bukkit.inventory.ItemStack;
-import org.zzq.forgingEnhancement.domain.model.ForgingStone;
-import org.zzq.forgingEnhancement.infrastructure.ForgingStoneFactory;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingStone;
+import org.zzq.forgingEnhancement.infrastructure.minecraft.services.ForgingStoneFactory;
 
 public class ForgingStoneServiceImpl implements IForgingStoneService{
     private ForgingStoneFactory forgingStoneFactory;

@@ -1,7 +1,7 @@
 package org.zzq.forgingEnhancement.services.foringstone;
 
 import org.bukkit.inventory.ItemStack;
-import org.zzq.forgingEnhancement.domain.model.ForgingStone;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingStone;
 
 public interface IForgingStoneService {
     ItemStack createForgingStone(ForgingStone forgingStone, int amount);

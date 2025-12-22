@@ -1,15 +1,19 @@
-package org.zzq.forgingEnhancement.domain.config;
+package org.zzq.forgingEnhancement.domain.valueobject;
 
+import org.zzq.forgingEnhancement.utils.RandomUtil;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
-public class ForgingAttributeConfig {
+public class ForgingAttributeValue {
     private String key;
     private String name;
     private boolean rare;
     private String operation;
     private Map<String, ValueRange> values;
 
-    public ForgingAttributeConfig(String key, String name, boolean rare, String operation, Map<String, ValueRange> values) {
+    public ForgingAttributeValue(String key, String name, boolean rare, String operation, Map<String, ValueRange> values) {
         this.key = key;
         this.name = name;
         this.rare = rare;
@@ -39,6 +43,13 @@ public class ForgingAttributeConfig {
         public double getMax() {
             return max;
         }
+
+        public double getRandomValue(){
+            double randomValue = min + (RandomUtil.nextDouble() * (max - min));
+            BigDecimal bigDecimal = new BigDecimal(Double.toString(randomValue));
+            bigDecimal = bigDecimal.setScale(4, RoundingMode.HALF_UP);
+            return bigDecimal.doubleValue();
+        }
     }
 
     public String getKey() {
@@ -59,5 +70,17 @@ public class ForgingAttributeConfig {
 
     public Map<String, ValueRange> getValues() {
         return values;
+    }
+
+    public ValueRange getValueRangeByLevel(int level){
+        return switch (level) {
+            case 0 -> values.get("BROKEN");
+            case 1 -> values.get("COMMON");
+            case 2 -> values.get("UNCOMMON");
+            case 3 -> values.get("EPIC");
+            case 4 -> values.get("LEGENDARY");
+            case 5 -> values.get("MYTHIC");
+            default -> values.get("COMMON");
+        };
     }
 }

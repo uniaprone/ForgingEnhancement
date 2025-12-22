@@ -1,13 +1,12 @@
-package org.zzq.forgingEnhancement.infrastructure;
+package org.zzq.forgingEnhancement.infrastructure.minecraft.services;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.bukkit.persistence.PersistentDataType;
-import org.zzq.forgingEnhancement.domain.model.ForgingStone;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingStone;
 import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
 import org.zzq.forgingEnhancement.utils.ColorUtil;
 

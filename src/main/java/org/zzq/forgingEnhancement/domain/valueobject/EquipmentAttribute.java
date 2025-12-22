@@ -1,12 +1,14 @@
-package org.zzq.forgingEnhancement.domain.config;
+package org.zzq.forgingEnhancement.domain.valueobject;
+
+import org.zzq.forgingEnhancement.utils.RandomUtil;
 
 import java.util.List;
 
-public class ForgingAttributePoolConfig {
+public class EquipmentAttribute{
     private String tool;
     private List<String> attributes;
 
-    public ForgingAttributePoolConfig(String tool, List<String> attributes) {
+    public EquipmentAttribute(String tool, List<String> attributes) {
         this.tool = tool;
         this.attributes = attributes;
     }

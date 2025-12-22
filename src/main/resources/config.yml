@@ -1,18 +1,4 @@
-# 锻造增强插件配置
-# 稀有词条出现概率 (0-1)
-rare-chance: 0.2
-
-# 可强化的装备类型后缀
-enhanceable-equipment-suffixes:
-  - _BOOTS
-  - _LEGGINGS
-  - _CHESTPLATE
-  - _HELMET
-  - _SWORD
-  - _AXE
-  - _PICKAXE
-  - _SHOVEL
-  - _HOE
+env: DEBUG
 
 # 消息格式
 messages:

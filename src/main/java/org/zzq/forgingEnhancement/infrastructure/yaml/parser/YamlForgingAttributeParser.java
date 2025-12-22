@@ -4,7 +4,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.zzq.forgingEnhancement.domain.config.ForgingAttributeConfig;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeConfig;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeValue;
 
 import java.io.File;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class YamlForgingAttributeParser {
         this.plugin = plugin;
     }
 
-    public Map<String, ForgingAttributeConfig> load(){
+    public ForgingAttributeConfig load(){
         try{
             file = new File(plugin.getDataFolder(), "forging_attribute.yml");
             if(!file.exists()){
@@ -27,7 +28,7 @@ public class YamlForgingAttributeParser {
                 file = new File(plugin.getDataFolder(), "forging_attribute.yml");
             }
             fileConfiguration = YamlConfiguration.loadConfiguration(file);
-            Map<String, ForgingAttributeConfig> forgingAttributeConfig = parse();
+            ForgingAttributeConfig forgingAttributeConfig = parse();
             plugin.getLogger().info("读取锻造属性成功!");
             return forgingAttributeConfig;
         }catch (Exception e){
@@ -37,8 +38,8 @@ public class YamlForgingAttributeParser {
         }
     }
 
-    public Map<String, ForgingAttributeConfig> parse() {
-        Map<String, ForgingAttributeConfig> map = new HashMap<>();
+    public ForgingAttributeConfig parse() {
+        Map<String, ForgingAttributeValue> map = new HashMap<>();
         for (String key : fileConfiguration.getKeys(false)) {
             // 收集所有基础属性
             String name = fileConfiguration.getString(key + ".name", key);
@@ -46,23 +47,23 @@ public class YamlForgingAttributeParser {
             String operation = fileConfiguration.getString(key + ".operation", "ADD_SCALAR");
 
             // 收集values
-            Map<String, ForgingAttributeConfig.ValueRange> values = new HashMap<>();
+            Map<String, ForgingAttributeValue.ValueRange> values = new HashMap<>();
             ConfigurationSection valuesSection = fileConfiguration.getConfigurationSection(key + ".values");
             if (valuesSection != null) {
                 for (String quality : valuesSection.getKeys(false)) {
                     String valuePath = key + ".values." + quality;
                     double min = fileConfiguration.getDouble(valuePath + ".min");
                     double max = fileConfiguration.getDouble(valuePath + ".max");
-                    values.put(quality, new ForgingAttributeConfig.ValueRange(quality, min, max));
+                    values.put(quality, new ForgingAttributeValue.ValueRange(quality, min, max));
                 }
             }
 
             // 创建配置对象
-            ForgingAttributeConfig config = new ForgingAttributeConfig(
+            ForgingAttributeValue config = new ForgingAttributeValue(
                 key, name, rare, operation, values
             );
             map.put(key, config);
         }
-        return map;
+        return new ForgingAttributeConfig(map);
     }
 }

@@ -1,3 +1,14 @@
+forgeable_equipment:
+  - BOOTS
+  - LEGGINGS
+  - CHESTPLATE
+  - HELMET
+  - SWORD
+  - AXE
+  - PICKAXE
+  - SHOVEL
+  - HOE
+
 attribute_pool:
   helmet:
     - armor

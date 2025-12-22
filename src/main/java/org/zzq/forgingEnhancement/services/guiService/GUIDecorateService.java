@@ -3,17 +3,16 @@ package org.zzq.forgingEnhancement.services.guiService;
 import com.google.gson.Gson;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.util.RGBLike;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.w3c.dom.css.RGBColor;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeConfig;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeValue;
 import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
 import org.zzq.forgingEnhancement.managers.ConfigManager;
-import org.zzq.forgingEnhancement.models.ForgingAttribute;
+import org.zzq.forgingEnhancement.domain.entity.ForgingAttribute;
 import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingHolder;
 import org.zzq.forgingEnhancement.utils.ColorUtil;
 
@@ -27,7 +26,7 @@ public class GUIDecorateService {
     private Logger logger;
     private final Gson gson = new Gson();
     private KeyManager keyManager;
-    private ConfigManager configManager;
+    private ForgingAttributeConfig forgingAttributeConfig;
 
     private List<ItemStack> decorateItemList = List.of(
          new ItemStack(Material.GRAY_STAINED_GLASS_PANE),
@@ -43,10 +42,10 @@ public class GUIDecorateService {
     private int[] rightBroadSolts = new int[]{
             5,6,7,8,17,26,35,44,53,52,51,50
     };
-    public GUIDecorateService(Logger logger, ConfigManager configManager, KeyManager keyManager){
+    public GUIDecorateService(Logger logger, ForgingAttributeConfig forgingAttributeConfig, KeyManager keyManager){
         this.logger = logger;
         this.keyManager = keyManager;
-        this.configManager = configManager;
+        this.forgingAttributeConfig = forgingAttributeConfig;
     }
 
     public Map<Integer, ItemStack> placeForgingItem(ItemStack itemStack){
@@ -105,11 +104,11 @@ public class GUIDecorateService {
 
     public void guiItemDisplay(ItemMeta itemMeta, ForgingAttribute forgingAttribute) {
         List<Component> newLore = new ArrayList<>();
-        ConfigManager.AttributeConfig config = configManager.getAttributeConfig(forgingAttribute.getName());
+        ForgingAttributeValue config = forgingAttributeConfig.getForgingAttributeValue(forgingAttribute.getName());
         if (config != null) {
             NamedTextColor attrColor = ColorUtil.getColorByLevel(forgingAttribute.getLevel());
             String valueDisplay = formatAttributeValue(config, forgingAttribute.getValue());
-            itemMeta.displayName(Component.text("属性：" + config.name).color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE));
+            itemMeta.displayName(Component.text("属性：" + config.getName()).color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE));
             Component suffixComponent = Component.text(" 『" + getQualityDisplayName(forgingAttribute.getLevel()) + "』").color(attrColor).decorate(TextDecoration.ITALIC);
             if(forgingAttribute.getValue() > 0){
                 Component attributeComponent = Component.text("+" + valueDisplay).color(attrColor).decoration(TextDecoration.ITALIC,  TextDecoration.State.FALSE).append(suffixComponent);
@@ -138,8 +137,8 @@ public class GUIDecorateService {
         }
     }
 
-    private String formatAttributeValue(ConfigManager.AttributeConfig config, double value) {
-        if ("ADD_NUMBER".equals(config.operation)) {
+    private String formatAttributeValue(ForgingAttributeValue config, double value) {
+        if ("ADD_NUMBER".equals(config.getOperation())) {
             return String.format("%.1f", value);
         } else {
             return String.format("%.1f%%", value * 100);

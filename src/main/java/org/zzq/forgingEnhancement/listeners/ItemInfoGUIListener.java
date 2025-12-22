@@ -3,6 +3,7 @@ package org.zzq.forgingEnhancement.listeners;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -25,6 +26,12 @@ public class ItemInfoGUIListener implements Listener {
     }
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        ClickType clickType = event.getClick();
+        Player player = (Player) event.getWhoClicked();
+        if(clickType.isRightClick()){
+            itemInfoGUIService.openItemInfoGUI(player, event.getCurrentItem());
+        }
+
         // 检查点击的库存是否是我们自定义的GUI
         if (!(event.getInventory().getHolder() instanceof ItemInfoGUIHolder)) {
             return; // 不是我们的GUI，不处理
@@ -39,7 +46,6 @@ public class ItemInfoGUIListener implements Listener {
 
         // 可选：添加关闭按钮功能
         if (event.getSlot() == 49) { // 假设右下角是关闭按钮
-            Player player = (Player) event.getWhoClicked();
             player.closeInventory();
         }
     }

@@ -1,76 +1,45 @@
-package org.zzq.forgingEnhancement.services;
+package org.zzq.forgingEnhancement.infrastructure.minecraft.services;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.zzq.forgingEnhancement.managers.BaseAttributeManager;
-import org.zzq.forgingEnhancement.managers.ConfigManager;
+import org.zzq.forgingEnhancement.domain.entity.ForgingAttribute;
+import org.zzq.forgingEnhancement.domain.services.IAttributeApplier;
+import org.zzq.forgingEnhancement.domain.valueobject.*;
+import org.zzq.forgingEnhancement.infrastructure.ForgingLogger;
 import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
-import org.zzq.forgingEnhancement.models.EnhancementResult;
-import org.zzq.forgingEnhancement.models.ForgingAttribute;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 
-public class AttributeService {
-    private Logger logger;
-    private ConfigManager configManager;
-    private BaseAttributeManager baseAttributeManager;
+public class MinecraftAttributeApplier implements IAttributeApplier {
+    private ForgingAttributeConfig forgingAttributeConfig;
+    private BaseAttributeConfig baseAttributeConfig;
+    private ForgingLogger forgingLogger;
     private KeyManager keyManager;
 
-    public AttributeService(Logger logger, ConfigManager configManager, BaseAttributeManager baseAttributeManager, KeyManager keyManager){
-        this.logger = logger;
-        this.configManager = configManager;
-        this.baseAttributeManager = baseAttributeManager;
+    public MinecraftAttributeApplier(ForgingAttributeConfig forgingAttributeConfig, BaseAttributeConfig baseAttributeConfig, ForgingLogger forgingLogger, KeyManager keyManager){
+        this.forgingAttributeConfig = forgingAttributeConfig;
+        this.baseAttributeConfig = baseAttributeConfig;
+        this.forgingLogger = forgingLogger;
         this.keyManager = keyManager;
     }
+
     public void applyExtraAttributes(ItemMeta meta, Material material, List<ForgingAttribute> forgingAttributes) {
         for (ForgingAttribute forgingAttribute : forgingAttributes) {
             applySingleAttribute(meta, forgingAttribute, material);
         }
     }
 
-    public EnhancementResult removeHasEngravedResult(EnhancementResult enhancementResult, List<ForgingAttribute> engravedForgingAttributes) {
-        List<ForgingAttribute> forgingAttributes = enhancementResult.getAttributeList();
-        Iterator<ForgingAttribute> iterator = forgingAttributes.iterator();
-        while (iterator.hasNext()){
-            ForgingAttribute forgingAttribute = iterator.next();
-            for(ForgingAttribute engravedForgingAttribute : engravedForgingAttributes){
-                if(forgingAttribute.getName().equals(engravedForgingAttribute.getName())){
-                    iterator.remove();
-                }
-            }
-        }
-        return enhancementResult;
-    }
-
-    public void addEngravedResult(EnhancementResult enhancementResult, List<ForgingAttribute> engravedForgingAttributes) {
-        List<ForgingAttribute> forgingAttributes = enhancementResult.getAttributeList();
-        forgingAttributes.addAll(0, engravedForgingAttributes);
-    }
-
     public void applyBaseAttributes(ItemMeta meta, Material material) {
-        String equipmentType = configManager.getEquipmentType(material);
-        if (equipmentType == null) {
-            logger.warning("无法确定装备类型: " + material);
-            return;
-        }
-
-        Map<String, Double> baseAttrs = baseAttributeManager.getBaseAttributes(material);
-        if (baseAttrs.isEmpty()) {
-            logger.warning("装备类型 " + equipmentType + " 没有基础属性配置");
-            return;
-        }
-
-        for (Map.Entry<String, Double> attribute : baseAttributeManager.getBaseAttributes(material).entrySet()){
+        BaseAttribute baseAttribute = baseAttributeConfig.getBaseAttributes(material.name().toLowerCase());
+        for (Map.Entry<String, Double> attribute : baseAttribute.getAttributes().entrySet()){
             org.bukkit.attribute.Attribute bukkitAttribute = getBukkitAttribute(attribute.getKey());
             if (bukkitAttribute == null) {
-                logger.warning("未知的基础属性: " + attribute);
+                forgingLogger.debug("未知的基础属性: " + attribute);
                 continue;
             }
 
@@ -94,7 +63,7 @@ public class AttributeService {
                         baseAttrNamespaceKey = NamespacedKey.minecraft("armor.boots");
                     }
                 }
-                default -> logger.warning("未知的基础属性: " + attribute);
+                default -> forgingLogger.debug("未知的基础属性: " + attribute);
             }
             AttributeModifier baseAttrModifier = new AttributeModifier(
                     baseAttrNamespaceKey,
@@ -106,16 +75,16 @@ public class AttributeService {
         }
     }
 
-    private void applySingleAttribute(ItemMeta meta, ForgingAttribute forgingAttribute, Material material) {
-        ConfigManager.AttributeConfig config = configManager.getAttributeConfig(forgingAttribute.getName());
-        if (config == null) {
-            logger.warning("未知的属性配置: " + forgingAttribute.getName());
+    public void applySingleAttribute(ItemMeta meta, ForgingAttribute forgingAttribute, Material material) {
+        ForgingAttributeValue forgingAttributeValue = forgingAttributeConfig.getForgingAttributeValue(forgingAttribute.getName());
+        if (forgingAttributeValue == null) {
+            forgingLogger.debug("未知的属性配置: " + forgingAttribute.getName());
             return;
         }
 
         org.bukkit.attribute.Attribute bukkitAttribute = getBukkitAttribute(forgingAttribute.getName());
         if (bukkitAttribute == null) {
-            logger.warning("未知的Bukkit属性: " + forgingAttribute.getName());
+            forgingLogger.debug("未知的Bukkit属性: " + forgingAttribute.getName());
             return;
         }
 
@@ -130,11 +99,12 @@ public class AttributeService {
         AttributeModifier modifier = new AttributeModifier(
                 modifierKey,
                 forgingAttribute.getValue(),
-                AttributeModifier.Operation.valueOf(config.operation),
+                AttributeModifier.Operation.valueOf(forgingAttributeValue.getOperation()),
                 material.getEquipmentSlot().getGroup()
         );
 
         // 添加属性修饰符（不会移除原有的）
+        forgingLogger.debug("属性: " + bukkitAttribute.getKey() + " 修饰符: " + modifier.getAmount() + " 操作: " + modifier.getOperation() + " 名字: " + modifier.getName());
         meta.addAttributeModifier(bukkitAttribute, modifier);
     }
 
@@ -147,22 +117,6 @@ public class AttributeService {
             }
         }
     }
-
-//    public void removeForgingAttributesExpectEngraved(ItemMeta meta, List<ForgingAttribute> engravedForgingAttributes) {
-//        if(meta != null && meta.hasAttributeModifiers()){
-//            for (Map.Entry<Attribute, AttributeModifier> entry : Objects.requireNonNull(meta.getAttributeModifiers()).entries()) {
-//                for(ForgingAttribute engravedForgingAttribute : engravedForgingAttributes){
-//                    String attributeName = entry.getValue().getKey().toString();
-//                    logger.info("循环属性名： " + attributeName);
-//                    logger.info("铭刻属性名： " + engravedForgingAttribute.getName());
-//                    if(attributeName.contains("forgingenhancement") && !attributeName.contains(engravedForgingAttribute.getName())){
-//                        logger.info("移除属性名： " + attributeName);
-//                        meta.removeAttributeModifier(entry.getKey(),entry.getValue());
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private org.bukkit.attribute.Attribute getBukkitAttribute(String configKey) {
         switch (configKey) {
@@ -191,7 +145,7 @@ public class AttributeService {
             case "submerged_mining_speed": return org.bukkit.attribute.Attribute.SUBMERGED_MINING_SPEED;
             case "block_interaction_range": return org.bukkit.attribute.Attribute.BLOCK_INTERACTION_RANGE;
             default:
-                logger.warning("不支持的属性类型: " + configKey);
+                forgingLogger.debug("不支持的属性类型: " + configKey);
                 return null;
         }
     }

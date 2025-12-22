@@ -1,14 +1,12 @@
 package org.zzq.forgingEnhancement.infrastructure.yaml.repository;
 
-import org.zzq.forgingEnhancement.domain.config.ForgingAttributePoolConfig;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributePoolConfig;
 import org.zzq.forgingEnhancement.domain.reposity.IForgingAttributePoolRepository;
 import org.zzq.forgingEnhancement.infrastructure.yaml.parser.YamlForgingAttributePoolParser;
 
-import java.util.Map;
-
 public class YamlForgingAttributePoolRepository implements IForgingAttributePoolRepository {
     private YamlForgingAttributePoolParser yamlForgingAttributePoolParser;
-    private final Map<String, ForgingAttributePoolConfig> configChche;
+    private final ForgingAttributePoolConfig configChche;
 
     public YamlForgingAttributePoolRepository(YamlForgingAttributePoolParser yamlForgingAttributePoolParser) {
         this.yamlForgingAttributePoolParser = yamlForgingAttributePoolParser;
@@ -19,7 +17,7 @@ public class YamlForgingAttributePoolRepository implements IForgingAttributePool
     }
 
     @Override
-    public Map<String, ForgingAttributePoolConfig> getForgingAttributePool() {
+    public ForgingAttributePoolConfig getForgingAttributePool() {
         return configChche;
     }
 }

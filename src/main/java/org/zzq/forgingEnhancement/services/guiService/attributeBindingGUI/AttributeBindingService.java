@@ -11,9 +11,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
-import org.zzq.forgingEnhancement.managers.EngraveStoneManager;
-import org.zzq.forgingEnhancement.models.EnhancementResult;
-import org.zzq.forgingEnhancement.models.ForgingAttribute;
+import org.zzq.forgingEnhancement.infrastructure.manager.EngraveStoneManager;
+import org.zzq.forgingEnhancement.domain.entity.EnhancementResult;
+import org.zzq.forgingEnhancement.domain.entity.ForgingAttribute;
+import org.zzq.forgingEnhancement.infrastructure.minecraft.ForgingDataRepository;
 import org.zzq.forgingEnhancement.utils.SoundUtil;
 import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
 import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIHolder;
@@ -29,24 +30,24 @@ public class AttributeBindingService {
     private AttributeBindingHolder attributeBindingHolder;
     private EngraveStoneManager engraveStoneManager;
     private Inventory attributeBindingInventory;
-    private SoundUtil soundUtil;
     private KeyManager keyManager;
+    private ForgingDataRepository forgingDataRepository;
     private final Gson gson = new Gson();
 
-    public AttributeBindingService(Logger logger, KeyManager keyManager, GUIDecorateService guiDecorateService, EngraveStoneManager engraveStoneManager, SoundUtil soundUtil) {
+    public AttributeBindingService(Logger logger, KeyManager keyManager, GUIDecorateService guiDecorateService, EngraveStoneManager engraveStoneManager, ForgingDataRepository forgingDataRepository) {
         this.logger = logger;
         this.guiDecorateService = guiDecorateService;
         this.engraveStoneManager =engraveStoneManager;
-        this.soundUtil = soundUtil;
         this.keyManager = keyManager;
+        this.forgingDataRepository = forgingDataRepository;
     }
 
     public void openAttributeBindingGUI(Player player, int clickSlot, ItemStack forgingItem, ItemInfoGUIHolder itemInfoGUIHolder){
         ItemStack item = itemInfoGUIHolder.getSlotMap().get(clickSlot);
         if(!isValidInput(player, item)) return;
         ItemMeta itemMeta = item.getItemMeta();
-        String attributeString = itemMeta.getPersistentDataContainer().get(keyManager.getForgingAttributeGUIKey(), PersistentDataType.STRING);
-        ForgingAttribute forgingAttribute = gson.fromJson(attributeString, ForgingAttribute.class);
+
+        ForgingAttribute forgingAttribute = forgingDataRepository.getGUIForgingAttribute(itemMeta);
         Component titleComponent = getDisplayName(item);
         attributeBindingHolder = new AttributeBindingHolder(forgingItem, item);
         attributeBindingInventory = Bukkit.createInventory(attributeBindingHolder, 9, titleComponent);
@@ -93,7 +94,7 @@ public class AttributeBindingService {
         attributeBindingHolder.setForgingAttributeItem(attributeItem);
         attributeBindingInventory.setItem(1, attributeItem);
         bindingSlotItem.setAmount(bindingSlotItem.getAmount() - 1);
-        soundUtil.playEngraveSound(player);
+        SoundUtil.playEngraveSound(player);
     }
 
     public void cancelLogic(ItemStack itemStack, Player player) {

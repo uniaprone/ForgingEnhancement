@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
 import org.zzq.forgingEnhancement.ForgingEnhancement;
+import org.zzq.forgingEnhancement.domain.valueobject.ForgingStone;
 import org.zzq.forgingEnhancement.managers.PlayerSettingManager;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
 
     private final ForgingEnhancement plugin;
     private final List<String> subCommands = Arrays.asList("reload", "give", "info", "toggle");
-    private final List<String> qualities = Arrays.asList("broken","common", "uncommon", "epic", "legendary","mythic");
+    private final List<String> qualities = Arrays.asList("BROKEN","COMMON", "UNCOMMON", "EPIC", "LEGENDARY","MYTHIC");
 
     public ForgingEnhancementCommand(ForgingEnhancement plugin) {
         this.plugin = plugin;
@@ -36,14 +37,14 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
 
         switch (args[0].toLowerCase()) {
             case "reload":
-                if (sender.hasPermission("forgingenhancement.admin")) {
-                    plugin.getFileManager().reloadFile();
-                    plugin.reloadConfig();
-                    sender.sendMessage(ChatColor.GREEN + "锻造增强插件配置已重载!");
-                    plugin.getLogger().info("配置已通过命令重载");
-                } else {
-                    sender.sendMessage(ChatColor.RED + "你没有权限执行此命令!");
-                }
+//                if (sender.hasPermission("forgingenhancement.admin")) {
+//                    plugin.getFileManager().reloadFile();
+//                    plugin.reloadConfig();
+//                    sender.sendMessage(ChatColor.GREEN + "锻造增强插件配置已重载!");
+//                    plugin.getLogger().info("配置已通过命令重载");
+//                } else {
+//                    sender.sendMessage(ChatColor.RED + "你没有权限执行此命令!");
+//                }
                 break;
 
             case "give":
@@ -55,12 +56,12 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
                 break;
 
             case "info":
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    sendPluginInfo(player);
-                } else {
-                    sender.sendMessage(ChatColor.RED + "只有玩家可以执行此命令!");
-                }
+//                if (sender instanceof Player) {
+//                    Player player = (Player) sender;
+//                    sendPluginInfo(player);
+//                } else {
+//                    sender.sendMessage(ChatColor.RED + "只有玩家可以执行此命令!");
+//                }
                 break;
 
             case "toggle":
@@ -134,9 +135,8 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
 
     private void handelToggleCommand(CommandSender sender){
         Player player = (Player) sender;
-        PlayerSettingManager playerSettingManager = plugin.getFileManager().getplayerSettingManager();
-        playerSettingManager.toggleWorkBranchForging(player.getUniqueId(), player.getName());
-        boolean isEnable = playerSettingManager.getPlayerSetting(player.getUniqueId());
+
+        boolean isEnable = plugin.getTogglePlayerSettingService().togglePlayerSetting(player);
         if(isEnable){
             sender.sendMessage(ChatColor.GREEN + "工作台锻造模式已开启");
         }else{
@@ -172,20 +172,19 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
         }
         String quality = args[2].toUpperCase();
         // 验证品质是否有效
-        if (plugin.getStoneManager().getQualityDisplayNames().containsKey(quality)) {
+        if (ForgingStone.isMatchForgingStone(quality)) {
 
             // 创建锻造石并给予玩家
-            ItemStack forgingStone = plugin.getStoneManager().createForgingStone(quality, amount);
+            ItemStack forgingStone = plugin.getGiveService().give(quality, amount, 1);
             target.getInventory().addItem(forgingStone);
 
-            String displayName = plugin.getStoneManager().getQualityDisplayNames().get(quality);
-            sender.sendMessage(ChatColor.GREEN + "已给予 " + target.getName() + " " + amount + " 个" + displayName + "锻造石");
+            sender.sendMessage(ChatColor.GREEN + "已给予 " + target.getName() + " " + amount + " 个" + quality + "锻造石");
             if (!sender.equals(target)) {
-                target.sendMessage(ChatColor.GREEN + "你获得了 " + amount + " 个" + displayName + "锻造石");
+                target.sendMessage(ChatColor.GREEN + "你获得了 " + amount + " 个" + quality + "锻造石");
             }
         } else if (quality.equalsIgnoreCase("engravestone")) {
             // 创建锻造石并给予玩家
-            ItemStack engraveStone = plugin.getEngraveStoneManager().createBindingStone(amount);
+            ItemStack engraveStone = plugin.getGiveService().give(quality, amount, 2);
             target.getInventory().addItem(engraveStone);
 
             sender.sendMessage(ChatColor.GREEN + "已给予 " + target.getName() + " " + amount + " 个" + "铭刻石");
@@ -214,22 +213,22 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
         }
     }
 
-    private void sendPluginInfo(Player player) {
-        player.sendMessage(ChatColor.GOLD + "=== 锻造增强插件信息 ===");
-        player.sendMessage(ChatColor.GREEN + "✓ 支持全部装备类型的基础属性");
-        player.sendMessage(ChatColor.GREEN + "✓ 属性按原装备槽位生效");
-        player.sendMessage(ChatColor.GREEN + "✓ 支持6种品质等级");
-        player.sendMessage(ChatColor.GREEN + "✓ 可配置的属性池和数值范围");
-
-        // 显示可强化的装备类型数量
-        int equipmentTypes = plugin.getFileManager().getConfigManager().getEnhanceableEquipmentSuffixes().size();
-        player.sendMessage(ChatColor.AQUA + "可强化装备类型: " + equipmentTypes + "种");
-
-        // 显示支持的属性数量
-        int attributeCount = plugin.getFileManager().getConfigManager().getAllAttributes().size();
-        player.sendMessage(ChatColor.AQUA + "支持属性数量: " + attributeCount + "种");
-
-        // 显示可用的锻造石类型
-        player.sendMessage(ChatColor.AQUA + "锻造石类型: 普通, 优秀, 史诗, 传说");
-    }
+//    private void sendPluginInfo(Player player) {
+//        player.sendMessage(ChatColor.GOLD + "=== 锻造增强插件信息 ===");
+//        player.sendMessage(ChatColor.GREEN + "✓ 支持全部装备类型的基础属性");
+//        player.sendMessage(ChatColor.GREEN + "✓ 属性按原装备槽位生效");
+//        player.sendMessage(ChatColor.GREEN + "✓ 支持6种品质等级");
+//        player.sendMessage(ChatColor.GREEN + "✓ 可配置的属性池和数值范围");
+//
+//        // 显示可强化的装备类型数量
+//        int equipmentTypes = plugin.getFileManager().getConfigManager().getEnhanceableEquipmentSuffixes().size();
+//        player.sendMessage(ChatColor.AQUA + "可强化装备类型: " + equipmentTypes + "种");
+//
+//        // 显示支持的属性数量
+//        int attributeCount = plugin.getFileManager().getConfigManager().getAllAttributes().size();
+//        player.sendMessage(ChatColor.AQUA + "支持属性数量: " + attributeCount + "种");
+//
+//        // 显示可用的锻造石类型
+//        player.sendMessage(ChatColor.AQUA + "锻造石类型: 普通, 优秀, 史诗, 传说");
+//    }
 }

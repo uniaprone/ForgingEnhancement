@@ -1,0 +1,96 @@
+forgeable_equipment:
+  - BOOTS
+  - LEGGINGS
+  - CHESTPLATE
+  - HELMET
+  - SWORD
+  - AXE
+  - PICKAXE
+  - SHOVEL
+  - HOE
+
+attribute_pool:
+  helmet:
+    - armor
+    - armor_toughness
+    - burning_time
+    - explosion_knockback_resistance
+    - knockback_resistance
+    - max_health
+    - oxygen_bonus
+
+  chestplate:
+    - armor
+    - armor_toughness
+    - gravity
+    - burning_time
+    - explosion_knockback_resistance
+    - knockback_resistance
+    - max_health
+
+  leggings:
+    - movement_speed
+    - armor
+    - armor_toughness
+    - burning_time
+    - explosion_knockback_resistance
+    - knockback_resistance
+    - max_health
+    - sneaking_speed
+    - step_height
+
+  boots:
+    - armor
+    - armor_toughness
+    - burning_time
+    - explosion_knockback_resistance
+    - knockback_resistance
+    - max_health
+    - fall_damage_multiplier
+    - water_movement_efficiency
+    - movement_efficiency
+    - jump_strength
+    - safe_fall_distance
+
+  sword:
+    - attack_damage
+    - attack_knockback
+    - attack_speed
+    - entity_interaction_range
+    - sweeping_damage_ratio
+
+  axe:
+    - attack_damage
+    - attack_knockback
+    - attack_speed
+    - entity_interaction_range
+    - mining_efficiency
+    - submerged_mining_speed
+    - block_interaction_range
+
+  pickaxe:
+    - attack_damage
+    - attack_knockback
+    - attack_speed
+    - entity_interaction_range
+    - mining_efficiency
+    - submerged_mining_speed
+    - block_interaction_range
+
+  shovel:
+    - attack_damage
+    - attack_knockback
+    - attack_speed
+    - entity_interaction_range
+    - mining_efficiency
+    - submerged_mining_speed
+    - block_interaction_range
+
+  hoe:
+    - attack_damage
+    - attack_knockback
+    - attack_speed
+    - entity_interaction_range
+    - mining_efficiency
+    - submerged_mining_speed
+    - block_interaction_range

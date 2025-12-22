@@ -1,43 +1,56 @@
 package org.zzq.forgingEnhancement.listeners;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.zzq.forgingEnhancement.managers.ConfigManager;
-import org.zzq.forgingEnhancement.managers.StoneManager;
-import org.zzq.forgingEnhancement.services.ItemDisplayService;
+import org.zzq.forgingEnhancement.application.forging.AnvilForgingService;
+import org.zzq.forgingEnhancement.infrastructure.ForgingLogger;
 
 public class AnvilForgingListener implements Listener {
-    private final ConfigManager configManager;
-    private final StoneManager stoneManager;
-    private ItemDisplayService itemDisplayService;
-    
-    public AnvilForgingListener(ConfigManager configManager, StoneManager stoneManager, ItemDisplayService itemDisplayService) {
-        this.configManager = configManager;
-        this.stoneManager = stoneManager;
-        this.itemDisplayService = itemDisplayService;
+    private final AnvilForgingService anvilForgingService;
+    private ForgingLogger logger;
+    public AnvilForgingListener(AnvilForgingService anvilForgingService, ForgingLogger logger){
+        this.anvilForgingService = anvilForgingService;
+        this.logger = logger;
     }
 
-    // 修改onPrepareAnvil方法中的锻造石识别部分
     @EventHandler
-    public void onPrepareAnvil(PrepareAnvilEvent event) {
-        AnvilInventory anvil = event.getInventory();
+    public void onAnvilForging(InventoryClickEvent event) {
+        if(!(event.getInventory().getType() == InventoryType.ANVIL && event.getRawSlot() == 2)) return;
+        if(!(event.getWhoClicked() instanceof Player player)) return;
+
+        // 获取铁砧中的物品
+        AnvilInventory anvil = (AnvilInventory) event.getInventory();
         ItemStack firstItem = anvil.getFirstItem();
         ItemStack secondItem = anvil.getSecondItem();
-
-        if (firstItem != null && secondItem != null && stoneManager.isForgingStone(secondItem)) {
-            String firstItemType = configManager.getEquipmentType(firstItem.getType());
-            if (configManager.isEnhanceableEquipment(firstItemType)) {
-                ItemStack result = firstItem.clone();
-                ItemMeta resultItemMeta = result.getItemMeta();
-                itemDisplayService.updatePrepareAnvilDisplay(resultItemMeta, firstItem.getItemMeta(), stoneManager.getStoneQualityLevel(secondItem));
-                result.setItemMeta(resultItemMeta);
-                event.setResult(result);
-                event.getView().setRepairCost(0);
-            }
+        ItemStack resultItem = event.getCurrentItem();
+        if (firstItem == null || secondItem == null || resultItem == null) {
+            return;
         }
+        ItemStack resultForgingItem = anvilForgingService.forgeItem(player, resultItem, secondItem);
+        if(resultForgingItem == null) return;
+        event.setCancelled(true); // 取消默认的点击行为
+        anvil.setFirstItem(null);
+        anvil.setSecondItem(consumeItem(secondItem));
+        // 手动设置光标物品
+        event.getWhoClicked().setItemOnCursor(resultForgingItem);
+        // 更新铁砧结果槽为空
+        anvil.setResult(null);
+
+        logger.logForgingResult("铁砧", (Player)event.getWhoClicked(), resultForgingItem);
+    }
+    // 消耗物品（减少数量）
+    private ItemStack consumeItem(ItemStack item) {
+        if (item.getAmount() > 1) {
+            ItemStack consumed = item.clone();
+            consumed.setAmount(item.getAmount() - 1);
+            return consumed;
+        }
+        return null;
     }
 }
+

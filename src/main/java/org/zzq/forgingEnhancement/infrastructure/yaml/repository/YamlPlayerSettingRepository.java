@@ -21,6 +21,19 @@ public class YamlPlayerSettingRepository implements IPlayerSettingRepository {
     }
 
     @Override
+    public void reload() {
+        this.playerSettingMapCache = yamlPlayerSettingParser.load();
+        if (this.playerSettingMapCache == null) {
+            playerSettingMapCache = new PlayerSettingConfig(new HashMap<>());
+        }
+    }
+
+    @Override
+    public Map<String, PlayerSetting> getPlayerSettingMap() {
+        return playerSettingMapCache.getPlayerSettingMap();
+    }
+
+    @Override
     public PlayerSettingConfig getPlayerSettings() {
         return playerSettingMapCache;
     }

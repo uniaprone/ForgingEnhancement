@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.application;
+package org.zzq.forgingEnhancement.application.command;
 
 import org.bukkit.inventory.ItemStack;
 import org.zzq.forgingEnhancement.domain.valueobject.ForgingStone;

@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.application;
+package org.zzq.forgingEnhancement.application.command;
 
 import org.bukkit.entity.Player;
 import org.zzq.forgingEnhancement.domain.aggregateroot.PlayerSettingConfig;

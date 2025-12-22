@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
+import org.zzq.forgingEnhancement.application.guiService.ItemInfoGUI.ItemInfoGUIService;
 
 public class OpenItemInfoGUIListener implements Listener {
     private final ItemInfoGUIService itemInfoGUIService;

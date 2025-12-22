@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI;
+package org.zzq.forgingEnhancement.application.guiService.attributeBindingGUI;
 
 import com.google.gson.Gson;
 import net.kyori.adventure.text.Component;
@@ -16,8 +16,8 @@ import org.zzq.forgingEnhancement.domain.entity.EnhancementResult;
 import org.zzq.forgingEnhancement.domain.entity.ForgingAttribute;
 import org.zzq.forgingEnhancement.infrastructure.minecraft.ForgingDataRepository;
 import org.zzq.forgingEnhancement.utils.SoundUtil;
-import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIHolder;
+import org.zzq.forgingEnhancement.application.guiService.GUIDecorateService;
+import org.zzq.forgingEnhancement.application.guiService.ItemInfoGUI.ItemInfoGUIHolder;
 
 import java.util.HashMap;
 import java.util.List;

@@ -3,7 +3,7 @@ package org.zzq.forgingEnhancement.infrastructure.yaml.parser;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributePoolConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.ForgingAttributePoolConfig;
 import org.zzq.forgingEnhancement.domain.valueobject.EquipmentAttribute;
 
 import java.io.File;

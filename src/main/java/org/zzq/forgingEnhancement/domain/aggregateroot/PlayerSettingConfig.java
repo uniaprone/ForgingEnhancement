@@ -11,6 +11,10 @@ public class PlayerSettingConfig {
         this.playerSettingMap = playerSettingMap;
     }
 
+    public void updateConfig(Map<String, PlayerSetting> playerSettingMap){
+        this.playerSettingMap = playerSettingMap;
+    }
+
     public boolean isWorkbenchForgingEnable(String playerId){
         if(playerId == null) return false;
         if(playerSettingMap.get(playerId) == null) return false;
@@ -30,5 +34,9 @@ public class PlayerSettingConfig {
 
     public void addPlayerSetting(String playerId, String name){
         playerSettingMap.put(playerId, new PlayerSetting(playerId, name, true));
+    }
+
+    public Map<String, PlayerSetting> getPlayerSettingMap() {
+        return playerSettingMap;
     }
 }

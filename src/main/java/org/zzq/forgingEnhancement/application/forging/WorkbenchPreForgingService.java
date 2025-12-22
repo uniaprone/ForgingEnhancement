@@ -1,9 +1,9 @@
-package org.zzq.forgingEnhancement.application;
+package org.zzq.forgingEnhancement.application.forging;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.zzq.forgingEnhancement.domain.aggregateroot.PlayerSettingConfig;
-import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributePoolConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.ForgingAttributePoolConfig;
 import org.zzq.forgingEnhancement.infrastructure.ForgingLogger;
 import org.zzq.forgingEnhancement.infrastructure.minecraft.services.MinecraftItemService;
 

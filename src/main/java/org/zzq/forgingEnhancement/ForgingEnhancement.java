@@ -3,15 +3,21 @@ package org.zzq.forgingEnhancement;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.zzq.forgingEnhancement.application.*;
+import org.zzq.forgingEnhancement.application.command.GiveService;
+import org.zzq.forgingEnhancement.application.command.ReloadService;
+import org.zzq.forgingEnhancement.application.command.TogglePlayerSettingService;
+import org.zzq.forgingEnhancement.application.forging.AnvilForgingService;
+import org.zzq.forgingEnhancement.application.forging.AnvilPreForgingService;
+import org.zzq.forgingEnhancement.application.forging.WorkbenchForgingService;
+import org.zzq.forgingEnhancement.application.forging.WorkbenchPreForgingService;
 import org.zzq.forgingEnhancement.commands.ForgingEnhancementCommand;
 import org.zzq.forgingEnhancement.domain.aggregateroot.SelectAttribute;
 import org.zzq.forgingEnhancement.domain.entity.ForgingConfig;
 import org.zzq.forgingEnhancement.domain.aggregateroot.PlayerSettingConfig;
 import org.zzq.forgingEnhancement.domain.services.Recast;
-import org.zzq.forgingEnhancement.domain.valueobject.BaseAttributeConfig;
-import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeConfig;
-import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributePoolConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.BaseAttributeConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.ForgingAttributeConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.ForgingAttributePoolConfig;
 import org.zzq.forgingEnhancement.infrastructure.ForgingLogger;
 import org.zzq.forgingEnhancement.infrastructure.minecraft.services.ForgingStoneFactory;
 import org.zzq.forgingEnhancement.infrastructure.minecraft.ForgingDataRepository;
@@ -22,16 +28,14 @@ import org.zzq.forgingEnhancement.infrastructure.yaml.repository.*;
 import org.zzq.forgingEnhancement.listeners.*;
 import org.zzq.forgingEnhancement.infrastructure.manager.EngraveStoneManager;
 import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
-import org.zzq.forgingEnhancement.managers.StoneManager;
-import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
-import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingService;
+import org.zzq.forgingEnhancement.application.guiService.GUIDecorateService;
+import org.zzq.forgingEnhancement.application.guiService.ItemInfoGUI.ItemInfoGUIService;
+import org.zzq.forgingEnhancement.application.guiService.attributeBindingGUI.AttributeBindingService;
 import org.zzq.forgingEnhancement.utils.RandomUtil;
 
 public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     private KeyManager keyManager;
-    private StoneManager stoneManager;
     private AnvilForgingService anvilForgingService;
     private ItemInfoGUIService itemInfoGUIService;
     private AttributeBindingService attributeBindingService;
@@ -43,12 +47,12 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     private TogglePlayerSettingService togglePlayerSettingService;
     private GiveService giveService;
     private ForgingStoneFactory forgingStoneFactory;
+    private ReloadService reloadService;
     private RandomUtil randomUtil;
 
     @Override
     public void onEnable() {
         this.keyManager = new KeyManager(this);
-        this.stoneManager = new StoneManager(keyManager);
 
         initializeService();
         registerListeners();
@@ -82,12 +86,12 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
         randomUtil = new RandomUtil();
         engraveStoneManager = new EngraveStoneManager(keyManager);
-
-        forgingLogger = new ForgingLogger(this,forgingConfig);
+        ForgingDataRepository forgingDataRepository = new ForgingDataRepository(keyManager);
+        forgingLogger = new ForgingLogger(this,forgingConfig, forgingDataRepository);
         forgingStoneFactory = new ForgingStoneFactory(keyManager);
         MinecraftAttributeApplier minecraftAttributeApplier = new MinecraftAttributeApplier(forgingAttributeConfig, baseAttributeConfig, forgingLogger, keyManager);
         MinecraftItemService minecraftItemService = new MinecraftItemService(forgingAttributeConfig, keyManager);
-        ForgingDataRepository forgingDataRepository = new ForgingDataRepository(keyManager);
+
 
         SelectAttribute selectAttribute = new SelectAttribute(forgingAttributeConfig, forgingAttributePoolConfig);
 
@@ -104,7 +108,8 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
                 minecraftItemService,
                 forgingDataRepository,
                 selectAttribute,
-                minecraftAttributeApplier
+                minecraftAttributeApplier,
+                playerSettingConfig
         );
 
         this.anvilForgingService = new AnvilForgingService(
@@ -119,15 +124,28 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
         togglePlayerSettingService = new TogglePlayerSettingService(yamlPlayerSettingRepository, forgingLogger);
 
         giveService = new GiveService(forgingStoneFactory, engraveStoneManager);
+
+        reloadService = new ReloadService(
+                yamlBaseAttributeRepository,
+                yamlConfigRepository,
+                yamlForgingAttributeRepository,
+                yamlForgingAttributePoolRepository,
+                yamlPlayerSettingRepository,
+                baseAttributeConfig,
+                forgingConfig,
+                forgingAttributeConfig,
+                forgingAttributePoolConfig,
+                playerSettingConfig
+        );
     }
 
     private void registerListeners(){
         PluginManager  pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(this, this);
         pluginManager.registerEvents(new WorkbenchPreForgingListener(workbenchPreForgingService, forgingLogger), this);
-        pluginManager.registerEvents(new WorkbenchForgingListener(workbenchForgingService), this);
+        pluginManager.registerEvents(new WorkbenchForgingListener(workbenchForgingService, forgingLogger), this);
         pluginManager.registerEvents(new AnvilPreForgingListener(anvilPreForgingService), this);
-        pluginManager.registerEvents(new AnvilForgingListener(anvilForgingService), this);
+        pluginManager.registerEvents(new AnvilForgingListener(anvilForgingService, forgingLogger), this);
         pluginManager.registerEvents(new OpenItemInfoGUIListener(itemInfoGUIService), this);
         pluginManager.registerEvents(new ItemInfoGUIListener(this.getLogger(), itemInfoGUIService, attributeBindingService), this);
         pluginManager.registerEvents(new AttributeBindingGUIListener(this.getLogger(), attributeBindingService, itemInfoGUIService), this);
@@ -136,10 +154,6 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         getLogger().info("锻造增强插件已禁用!");
-    }
-
-    public StoneManager getStoneManager() {
-        return stoneManager;
     }
 
     public EngraveStoneManager getEngraveStoneManager() {
@@ -152,5 +166,9 @@ public class ForgingEnhancement extends JavaPlugin implements Listener {
 
     public GiveService getGiveService() {
         return giveService;
+    }
+
+    public ReloadService getReloadService() {
+        return reloadService;
     }
 }

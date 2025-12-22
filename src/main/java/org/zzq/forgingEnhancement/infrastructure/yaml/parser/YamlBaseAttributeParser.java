@@ -4,10 +4,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.zzq.forgingEnhancement.domain.valueobject.BaseAttribute;
-import org.zzq.forgingEnhancement.domain.valueobject.BaseAttributeConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.BaseAttributeConfig;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class YamlBaseAttributeParser {
@@ -42,7 +43,7 @@ public class YamlBaseAttributeParser {
         Map<String, BaseAttribute> baseAttributeMap = new HashMap<>();
         for (String itemName : fileConfiguration.getConfigurationSection("base_attributes").getKeys(false)){
             String path = "base_attributes." + itemName;
-            Map<String, Double> attributes = new HashMap<>();
+            LinkedHashMap<String, Double> attributes = new LinkedHashMap<>();
             for (String attributeName : fileConfiguration.getConfigurationSection(path).getKeys(false)){
                 String valuePath = path + "." + attributeName;
                 double attributeValue = fileConfiguration.getDouble(valuePath, 0);

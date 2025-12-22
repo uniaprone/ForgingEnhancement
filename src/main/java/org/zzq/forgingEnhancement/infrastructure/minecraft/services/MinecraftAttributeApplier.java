@@ -5,6 +5,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.zzq.forgingEnhancement.domain.aggregateroot.BaseAttributeConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.ForgingAttributeConfig;
 import org.zzq.forgingEnhancement.domain.entity.ForgingAttribute;
 import org.zzq.forgingEnhancement.domain.services.IAttributeApplier;
 import org.zzq.forgingEnhancement.domain.valueobject.*;

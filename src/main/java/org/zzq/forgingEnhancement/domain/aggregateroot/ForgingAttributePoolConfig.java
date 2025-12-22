@@ -1,6 +1,6 @@
-package org.zzq.forgingEnhancement.domain.valueobject;
+package org.zzq.forgingEnhancement.domain.aggregateroot;
 
-import org.zzq.forgingEnhancement.infrastructure.ForgingLogger;
+import org.zzq.forgingEnhancement.domain.valueobject.EquipmentAttribute;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +11,11 @@ public class ForgingAttributePoolConfig {
     private Map<String, EquipmentAttribute> equipmentAttributesMap;
 
     public ForgingAttributePoolConfig(List<String> forgeableEquipments, Map<String, EquipmentAttribute> equipmentAttributesMap) {
+        this.forgeableEquipments = forgeableEquipments;
+        this.equipmentAttributesMap = equipmentAttributesMap;
+    }
+
+    public void updateConfig(List<String> forgeableEquipments, Map<String, EquipmentAttribute> equipmentAttributesMap){
         this.forgeableEquipments = forgeableEquipments;
         this.equipmentAttributesMap = equipmentAttributesMap;
     }
@@ -38,5 +43,13 @@ public class ForgingAttributePoolConfig {
             }
         }
         return null;
+    }
+
+    public List<String> getForgeableEquipments() {
+        return forgeableEquipments;
+    }
+
+    public Map<String, EquipmentAttribute> getEquipmentAttributesMap() {
+        return equipmentAttributesMap;
     }
 }

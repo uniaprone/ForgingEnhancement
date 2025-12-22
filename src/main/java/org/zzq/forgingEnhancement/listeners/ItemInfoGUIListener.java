@@ -7,10 +7,9 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.ItemStack;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIHolder;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
-import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingService;
+import org.zzq.forgingEnhancement.application.guiService.ItemInfoGUI.ItemInfoGUIHolder;
+import org.zzq.forgingEnhancement.application.guiService.ItemInfoGUI.ItemInfoGUIService;
+import org.zzq.forgingEnhancement.application.guiService.attributeBindingGUI.AttributeBindingService;
 
 import java.util.logging.Logger;
 

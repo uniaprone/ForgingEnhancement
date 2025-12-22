@@ -13,6 +13,11 @@ public class ForgingConfig {
         this.env = env;
     }
 
+    public void updateConfig(String env){
+        this.env = env;
+        notifyObservers();
+    }
+
     public void addObserver(IForgingConfigObserver forgingConfigObserver){
         observers.add(forgingConfigObserver);
     }
@@ -29,9 +34,5 @@ public class ForgingConfig {
 
     public String getEnv() {
         return env;
-    }
-
-    public void setEnv(String env) {
-        this.env = env;
     }
 }

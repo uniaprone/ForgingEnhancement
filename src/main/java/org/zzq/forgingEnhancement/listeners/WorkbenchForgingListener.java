@@ -7,14 +7,17 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
-import org.zzq.forgingEnhancement.application.WorkbenchForgingService;
+import org.zzq.forgingEnhancement.application.forging.WorkbenchForgingService;
+import org.zzq.forgingEnhancement.infrastructure.ForgingLogger;
 
 
 public class WorkbenchForgingListener implements Listener {
     private WorkbenchForgingService workbenchForgingService;
+    private ForgingLogger logger;
 
-    public WorkbenchForgingListener(WorkbenchForgingService workbenchForgingService) {
+    public WorkbenchForgingListener(WorkbenchForgingService workbenchForgingService, ForgingLogger logger) {
         this.workbenchForgingService = workbenchForgingService;
+        this.logger = logger;
     }
 
     @EventHandler
@@ -40,6 +43,9 @@ public class WorkbenchForgingListener implements Listener {
         event.getWhoClicked().setItemOnCursor(forgingResultItem);
         // 清空结果槽
         craftingInventory.setResult(null);
+
+        logger.logForgingResult("工作台", (Player)event.getWhoClicked(), forgingResultItem);
+
     }
     /**
      * 消耗合成网格中的物品

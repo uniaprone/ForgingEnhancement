@@ -4,7 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.ForgingAttributeConfig;
 import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeValue;
 
 import java.io.File;

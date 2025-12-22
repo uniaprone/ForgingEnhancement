@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
 import org.zzq.forgingEnhancement.ForgingEnhancement;
 import org.zzq.forgingEnhancement.domain.valueobject.ForgingStone;
-import org.zzq.forgingEnhancement.managers.PlayerSettingManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,14 +36,14 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
 
         switch (args[0].toLowerCase()) {
             case "reload":
-//                if (sender.hasPermission("forgingenhancement.admin")) {
-//                    plugin.getFileManager().reloadFile();
-//                    plugin.reloadConfig();
-//                    sender.sendMessage(ChatColor.GREEN + "锻造增强插件配置已重载!");
-//                    plugin.getLogger().info("配置已通过命令重载");
-//                } else {
-//                    sender.sendMessage(ChatColor.RED + "你没有权限执行此命令!");
-//                }
+                if (sender.hasPermission("forgingenhancement.admin")) {
+                    plugin.getReloadService().reload();
+                    plugin.reloadConfig();
+                    sender.sendMessage(ChatColor.GREEN + "锻造增强插件配置已重载!");
+                    plugin.getLogger().info("配置已通过命令重载");
+                } else {
+                    sender.sendMessage(ChatColor.RED + "你没有权限执行此命令!");
+                }
                 break;
 
             case "give":
@@ -165,11 +164,14 @@ public class ForgingEnhancementCommand implements CommandExecutor, TabCompleter 
             return;
         }
 
-        Player target = Bukkit.getPlayer(playerName);
-        if (target == null) {
+        boolean isTargetOnline = Bukkit.getOnlinePlayers().stream().anyMatch(
+                p -> p.getName().equalsIgnoreCase(playerName)
+        );
+        if (!isTargetOnline) {
             sender.sendMessage(ChatColor.RED + "玩家 " + playerName + " 不存在或不在线!");
             return;
         }
+        Player target = Bukkit.getPlayerExact(playerName);
         String quality = args[2].toUpperCase();
         // 验证品质是否有效
         if (ForgingStone.isMatchForgingStone(quality)) {

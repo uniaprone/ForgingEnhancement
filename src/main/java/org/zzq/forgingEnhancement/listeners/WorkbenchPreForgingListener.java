@@ -7,7 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
-import org.zzq.forgingEnhancement.application.WorkbenchPreForgingService;
+import org.zzq.forgingEnhancement.application.forging.WorkbenchPreForgingService;
 import org.zzq.forgingEnhancement.infrastructure.ForgingLogger;
 
 import java.util.*;

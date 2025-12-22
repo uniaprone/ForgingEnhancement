@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.services.guiService;
+package org.zzq.forgingEnhancement.application.guiService;
 
 import com.google.gson.Gson;
 import net.kyori.adventure.text.Component;
@@ -8,12 +8,11 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.ForgingAttributeConfig;
 import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributeValue;
 import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
-import org.zzq.forgingEnhancement.managers.ConfigManager;
 import org.zzq.forgingEnhancement.domain.entity.ForgingAttribute;
-import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingHolder;
+import org.zzq.forgingEnhancement.application.guiService.attributeBindingGUI.AttributeBindingHolder;
 import org.zzq.forgingEnhancement.utils.ColorUtil;
 
 import java.util.ArrayList;

@@ -6,9 +6,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
-import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingHolder;
-import org.zzq.forgingEnhancement.services.guiService.attributeBindingGUI.AttributeBindingService;
+import org.zzq.forgingEnhancement.application.guiService.ItemInfoGUI.ItemInfoGUIService;
+import org.zzq.forgingEnhancement.application.guiService.attributeBindingGUI.AttributeBindingHolder;
+import org.zzq.forgingEnhancement.application.guiService.attributeBindingGUI.AttributeBindingService;
 
 import java.util.Objects;
 import java.util.logging.Logger;

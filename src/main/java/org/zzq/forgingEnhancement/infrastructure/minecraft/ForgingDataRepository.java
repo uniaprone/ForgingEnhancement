@@ -55,4 +55,9 @@ public class ForgingDataRepository {
         String AttributesString = gson.toJson(enhancementResult);
         itemMeta.getPersistentDataContainer().set(keyManager.getEnhancementKey(),  PersistentDataType.STRING, AttributesString);
     }
+
+    public int getForgingItemLevel(ItemMeta itemMeta){
+        EnhancementResult enhancementResult = getForgingData(itemMeta);
+        return enhancementResult.getLevel();
+    }
 }

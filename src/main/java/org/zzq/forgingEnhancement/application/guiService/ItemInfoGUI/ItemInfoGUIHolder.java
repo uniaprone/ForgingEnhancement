@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI;
+package org.zzq.forgingEnhancement.application.guiService.ItemInfoGUI;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;

@@ -1,4 +1,4 @@
-env: DEBUG
+env: PRODUCTION
 
 # 消息格式
 messages:

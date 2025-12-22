@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI;
+package org.zzq.forgingEnhancement.application.guiService.ItemInfoGUI;
 
 import com.google.gson.Gson;
 import net.kyori.adventure.text.Component;
@@ -7,12 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
-import org.zzq.forgingEnhancement.infrastructure.manager.KeyManager;
 import org.zzq.forgingEnhancement.domain.entity.EnhancementResult;
 import org.zzq.forgingEnhancement.infrastructure.minecraft.ForgingDataRepository;
 import org.zzq.forgingEnhancement.infrastructure.minecraft.services.MinecraftItemService;
-import org.zzq.forgingEnhancement.services.guiService.GUIDecorateService;
+import org.zzq.forgingEnhancement.application.guiService.GUIDecorateService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +22,6 @@ public class ItemInfoGUIService {
     private GUIDecorateService guiDecorateService;
     private ItemInfoGUIHolder inventoryHolder;
     private ForgingDataRepository forgingDataRepository;
-    private Gson gson = new Gson();
     public ItemInfoGUIService(Logger logger, MinecraftItemService minecraftItemService, GUIDecorateService guiDecorateService, ForgingDataRepository forgingDataRepository) {
         this.logger = logger;
         this.guiDecorateService = guiDecorateService;

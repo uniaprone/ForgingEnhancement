@@ -7,14 +7,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
-import org.zzq.forgingEnhancement.application.AnvilForgingService;
-
-import org.zzq.forgingEnhancement.services.guiService.ItemInfoGUI.ItemInfoGUIService;
+import org.zzq.forgingEnhancement.application.forging.AnvilForgingService;
+import org.zzq.forgingEnhancement.infrastructure.ForgingLogger;
 
 public class AnvilForgingListener implements Listener {
     private final AnvilForgingService anvilForgingService;
-    public AnvilForgingListener(AnvilForgingService anvilForgingService){
+    private ForgingLogger logger;
+    public AnvilForgingListener(AnvilForgingService anvilForgingService, ForgingLogger logger){
         this.anvilForgingService = anvilForgingService;
+        this.logger = logger;
     }
 
     @EventHandler
@@ -39,6 +40,8 @@ public class AnvilForgingListener implements Listener {
         event.getWhoClicked().setItemOnCursor(resultForgingItem);
         // 更新铁砧结果槽为空
         anvil.setResult(null);
+
+        logger.logForgingResult("铁砧", (Player)event.getWhoClicked(), resultForgingItem);
     }
     // 消耗物品（减少数量）
     private ItemStack consumeItem(ItemStack item) {

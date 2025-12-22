@@ -58,6 +58,9 @@ public class SelectAttribute {
 
         double floatChance = 0.2;
         int floatableCount = (int) (attributeCount / 2.0);
+        if(ForgingStone.values().length - 1 == itemQualityLevel || itemQualityLevel == 0){
+            floatableCount = 0;
+        }
         int finalFloatCount = 0;
         for (int i = 0; i < floatableCount; i++){
             if(RandomUtil.nextDouble() < floatChance){

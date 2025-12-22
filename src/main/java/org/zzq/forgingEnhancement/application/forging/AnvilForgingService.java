@@ -1,4 +1,4 @@
-package org.zzq.forgingEnhancement.application;
+package org.zzq.forgingEnhancement.application.forging;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -7,7 +7,7 @@ import org.zzq.forgingEnhancement.domain.aggregateroot.SelectAttribute;
 import org.zzq.forgingEnhancement.domain.entity.EnhancementResult;
 import org.zzq.forgingEnhancement.domain.entity.ForgingAttribute;
 import org.zzq.forgingEnhancement.domain.services.Recast;
-import org.zzq.forgingEnhancement.domain.valueobject.ForgingAttributePoolConfig;
+import org.zzq.forgingEnhancement.domain.aggregateroot.ForgingAttributePoolConfig;
 import org.zzq.forgingEnhancement.domain.valueobject.ForgingStone;
 import org.zzq.forgingEnhancement.infrastructure.minecraft.ForgingDataRepository;
 import org.zzq.forgingEnhancement.infrastructure.minecraft.services.MinecraftAttributeApplier;
@@ -40,6 +40,8 @@ public class AnvilForgingService {
         ItemMeta resultItemMeta = resultItem.getItemMeta();
         String equipment = resultItem.getType().toString();
         if(!forgingAttributePoolConfig.isForgeableEquipment(equipment)) return null;
+        if(!minecraftItemService.isForgingStone(forgingStone)) return null;
+
         int baseLevel = minecraftItemService.getStoneLevel(forgingStone);
         //1.判断是否是重铸
         if(minecraftItemService.isForged(resultItemMeta)){
